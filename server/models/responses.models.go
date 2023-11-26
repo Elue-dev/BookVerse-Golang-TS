@@ -13,5 +13,5 @@ type SuccessResponseWithData struct {
 type ErrResponse struct {
 	Success bool `json:"success"`
 	Message string `json:"message"`
-	Error interface{} `json:"error"`
+	ErrorDetails interface{} `json:"error_details"`
 }

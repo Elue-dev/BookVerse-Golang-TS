@@ -32,8 +32,8 @@ func SendErrorResponse (w http.ResponseWriter, statusCode int, errorMsg string, 
 
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(models.ErrResponse{
-		Success: true,
+		Success: false,
 		Message: errorMsg,
-		Error: error,
+		ErrorDetails: error,
 	})
 }

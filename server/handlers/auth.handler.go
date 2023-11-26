@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/elue-dev/bookVerse/controllers"
 	"github.com/elue-dev/bookVerse/helpers"
 	"github.com/elue-dev/bookVerse/models"
 )
@@ -36,8 +37,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	 }
 
 	 user.Password = hashedPassword
-
-
+	 
 	 file, _, err := r.FormFile("avatar")
 	 if err != nil {
 		helpers.SendErrorResponse(w, 400, "Failed to get avatar from form",  err.Error())
@@ -65,5 +65,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
  
 	user.Avatar = uploadResult.SecureURL
 
-	helpers.SendSuccessResponseWithData(w, 201, user)
+	result, err := controllers.RegisterUser(user)
+
+	if err != nil {
+		helpers.SendErrorResponse(w, 400, "Could not create account. Please try again.",  err.Error())
+		return
+	}
+ 
+
+	helpers.SendSuccessResponseWithData(w, 201, result)
 }
