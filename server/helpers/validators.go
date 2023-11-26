@@ -1,7 +1,7 @@
 package helpers
 
-func ValidateSignUpFields(email, password, avatar string) bool {
-	if email == "" || password == "" || avatar == "" {
+func ValidateSignUpFields(username, email, password string) bool {
+	if username == "" || email == "" || password == "" {
 		return false
 	} else {
 		return true

@@ -9,9 +9,31 @@ import (
 
 func SendSuccessResponse (w http.ResponseWriter, statusCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(models.SuccessResponse{
 		Success: true,
 		Message: message,
+	})
+}
+
+func SendSuccessResponseWithData(w http.ResponseWriter, statusCode int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(models.SuccessResponseWithData{
+		Success: true,
+		Data: data,
+	})
+}
+
+func SendErrorResponse (w http.ResponseWriter, statusCode int, errorMsg string, error interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(models.ErrResponse{
+		Success: true,
+		Message: errorMsg,
+		Error: error,
 	})
 }
