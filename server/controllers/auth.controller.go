@@ -1,15 +1,16 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elue-dev/bookVerse/connections"
 	"github.com/elue-dev/bookVerse/models"
 )
 
 func RegisterUser(u models.User) (models.User, error) {
-	fmt.Println("USER", u)
 	db := connections.CeateConnection()
 	defer db.Close()
 
@@ -26,6 +27,30 @@ func RegisterUser(u models.User) (models.User, error) {
 		fmt.Printf("Failed to execute insert query: %v", err)
 		return user, errors.New(err.Error())
 	}
+
+	return user, nil
+}
+
+func LoginUser(p models.LoginPayload) (models.User, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery :=  `SELECT * FROM users
+				  WHERE lower(email) = $1 
+				  OR lower(username) = $2`;
+
+    var user models.User
+
+	rows := db.QueryRow(sqlQuery, strings.ToLower(p.Email), strings.ToLower(p.Username))
+	err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Avatar, &user.CreatedAt, &user.UpdatedAt)
+
+	if err != nil {
+        if err == sql.ErrNoRows {
+            return user, errors.New("invalid credentials provided")
+        }
+        fmt.Printf("Failed to scan row: %v", err)
+        return user, errors.New(err.Error())
+    }
 
 	return user, nil
 }

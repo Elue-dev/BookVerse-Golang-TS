@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/cloudinary/cloudinary-go/v2"
@@ -40,14 +41,14 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	 
 	 file, _, err := r.FormFile("avatar")
 	 if err != nil {
-		helpers.SendErrorResponse(w, 400, "Failed to get avatar from form",  err.Error())
+		helpers.SendErrorResponse(w, 500, "Failed to get avatar from form",  err.Error())
 		return
 	}
 	defer file.Close()
 
 	cld, err := cloudinary.New()
 	if err != nil {
-		helpers.SendErrorResponse(w, 400, "Failed to initialize Cloudinary",  err.Error())
+		helpers.SendErrorResponse(w, 500, "Failed to initialize Cloudinary",  err.Error())
 		return
 	}
 
@@ -59,7 +60,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		uploader.UploadParams{PublicID: "avatar"})
 
 	if err != nil {
-		helpers.SendErrorResponse(w, 400, "Failed to upload avatar",  err.Error())
+		helpers.SendErrorResponse(w, 500, "Failed to upload avatar",  err.Error())
 		return
 	}
  
@@ -68,10 +69,41 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	result, err := controllers.RegisterUser(user)
 
 	if err != nil {
-		helpers.SendErrorResponse(w, 400, "Could not create account. Please try again.",  err.Error())
+		helpers.SendErrorResponse(w, 500, "Could not create account. Please try again.",  err.Error())
 		return
 	}
  
 
 	helpers.SendSuccessResponseWithData(w, 201, result)
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	var payload models.LoginPayload
+
+	json.NewDecoder(r.Body).Decode(&payload)
+
+	if isValidated := helpers.ValidateLoginFields(payload.Username, payload.Email, payload.Password); !isValidated {
+		helpers.SendErrorResponse(w, 400, "Please provide username or email and password", nil)
+        return
+	}
+
+	currUser, err := controllers.LoginUser(payload)
+	if err != nil {
+		 helpers.SendErrorResponse(w, 400, "Invalid credentials provided", err.Error())
+		 return
+	}
+
+
+    if currUser.ID != "" && helpers.ComparePasswordWithHash(currUser.Password, payload.Password) {
+        token, err := helpers.GenerateToken(currUser.ID)
+        if err != nil {
+            helpers.SendErrorResponse(w, 500, "Error creating token", err.Error())
+            return
+        }
+        helpers.SendLoginSuccessResponse(w, 200, currUser, token)
+    } else {
+        // Handle the case where currUser is nil or password is incorrect
+        helpers.SendErrorResponse(w, 400, "Invalid credentials provided", nil)
+		return
+    }
 }

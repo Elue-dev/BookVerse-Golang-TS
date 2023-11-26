@@ -15,3 +15,9 @@ type ErrResponse struct {
 	Message string `json:"message"`
 	ErrorDetails interface{} `json:"error_details"`
 }
+
+type LoginResponse struct {
+	Success bool `json:"success"`
+	Token string `json:"token"`
+	Data interface{} `json:"data"`
+}

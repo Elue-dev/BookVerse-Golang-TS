@@ -27,6 +27,17 @@ func SendSuccessResponseWithData(w http.ResponseWriter, statusCode int, data int
 	})
 }
 
+func SendLoginSuccessResponse(w http.ResponseWriter, statusCode int, data interface{}, token string) {
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(models.LoginResponse{
+		Success: true,
+		Token: token,
+		Data: data,
+	})
+}
+
 func SendErrorResponse (w http.ResponseWriter, statusCode int, errorMsg string, error interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 
