@@ -41,7 +41,7 @@ func LoginUser(p models.LoginPayload) (models.User, error) {
 
     var user models.User
 
-	rows := db.QueryRow(sqlQuery, strings.ToLower(p.Email), strings.ToLower(p.Username))
+	rows := db.QueryRow(sqlQuery, strings.ToLower(p.EmailOrUsername), strings.ToLower(p.EmailOrUsername))
 	err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Avatar, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {

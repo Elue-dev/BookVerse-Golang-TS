@@ -15,6 +15,7 @@ export default function Hero() {
 
   const queryFn = async (): Promise<Book[]> => {
     const response = await httpRequest.get("/books");
+    console.log("books", response.data.books);
     return response.data.books;
   };
 

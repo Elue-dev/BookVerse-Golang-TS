@@ -41,7 +41,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	 
 	 file, _, err := r.FormFile("avatar")
 	 if err != nil {
-		helpers.SendErrorResponse(w, 500, "Failed to get avatar from form",  err.Error())
+		helpers.SendErrorResponse(w, 500, "Please provide an avatar",  err.Error())
 		return
 	}
 	defer file.Close()
@@ -82,7 +82,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(r.Body).Decode(&payload)
 
-	if isValidated := helpers.ValidateLoginFields(payload.Username, payload.Email, payload.Password); !isValidated {
+	if isValidated := helpers.ValidateLoginFields(payload.EmailOrUsername, payload.Password); !isValidated {
 		helpers.SendErrorResponse(w, 400, "Please provide username or email and password", nil)
         return
 	}

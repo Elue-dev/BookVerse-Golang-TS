@@ -1,8 +1,10 @@
 import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import Unauthenticated from "./components/protect_routes/unauthenticated";
 
 const Home = lazy(() => import("./pages/home/Home"));
+const Auth = lazy(() => import("./pages/auth/Auth"));
 
 function App() {
   return (
@@ -23,6 +25,14 @@ function App() {
           >
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route
+                path="/auth"
+                element={
+                  // <Unauthenticated>
+                  <Auth />
+                  // </Unauthenticated>
+                }
+              />
               {/* <Route
                 path="/auth"
                 element={

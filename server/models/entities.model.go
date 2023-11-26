@@ -11,7 +11,6 @@ type User struct {
 }
 
 type LoginPayload struct {
-	Email string `json:"email"` 
-	Username string `json:"username"` 
+	EmailOrUsername string `json:"emailOrUsername"` 
 	Password string `json:"password"` 
 }

@@ -8,8 +8,8 @@ func ValidateSignUpFields(username, email, password string) bool {
 	}
 }
 
-func ValidateLoginFields(username, email, password string) bool {
-	if username == "" && email == "" || password == "" {
+func ValidateLoginFields(emailOrUsername, password string) bool {
+	if emailOrUsername == "" || password == "" {
 		return false
 	} else {
 		return true
