@@ -2,4 +2,4 @@
 
 ## Langauges
 
-- TypeScript
+- TypeScript (React Framework)
