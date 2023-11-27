@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elue-dev/bookVerse/connections"
-	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/connections"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
 )
 
 func RegisterUser(u models.User) (models.User, error) {

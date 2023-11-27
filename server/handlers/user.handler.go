@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/elue-dev/bookVerse/controllers"
-	"github.com/elue-dev/bookVerse/helpers"
+	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
+	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/gorilla/mux"
 )
 

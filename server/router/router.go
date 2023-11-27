@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/elue-dev/bookVerse/handlers"
-	"github.com/elue-dev/bookVerse/middlewares"
+	"github.com/elue-dev/BookVerse-Golang-TS/handlers"
+	"github.com/elue-dev/BookVerse-Golang-TS/middlewares"
 	"github.com/gorilla/mux"
 )
 

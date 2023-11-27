@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/elue-dev/bookVerse/helpers"
+	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 )
 
 type contextKey string

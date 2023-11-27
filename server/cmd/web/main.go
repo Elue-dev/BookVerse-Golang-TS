@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/elue-dev/bookVerse/router"
+	"github.com/elue-dev/BookVerse-Golang-TS/router"
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 )

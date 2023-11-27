@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/elue-dev/bookVerse/connections"
-	"github.com/elue-dev/bookVerse/models"
-	"github.com/elue-dev/bookVerse/utils"
+	"github.com/elue-dev/BookVerse-Golang-TS/connections"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/utils"
 	"github.com/lib/pq"
 )
 

@@ -7,9 +7,9 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
-	"github.com/elue-dev/bookVerse/controllers"
-	"github.com/elue-dev/bookVerse/helpers"
-	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
+	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
 )
 
 func SignUp(w http.ResponseWriter, r *http.Request) {

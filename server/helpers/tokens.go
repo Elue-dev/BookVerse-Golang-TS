@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/elue-dev/bookVerse/connections"
-	"github.com/elue-dev/bookVerse/controllers"
-	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/connections"
+	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
 )
 
 func GenerateToken(userID string) (string, error) {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
 )
 
 func SendSuccessResponse(w http.ResponseWriter, statusCode int, message string) {

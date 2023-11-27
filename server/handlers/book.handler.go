@@ -8,10 +8,10 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
-	"github.com/elue-dev/bookVerse/controllers"
-	"github.com/elue-dev/bookVerse/helpers"
-	"github.com/elue-dev/bookVerse/models"
-	"github.com/elue-dev/bookVerse/utils"
+	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
+	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/utils"
 	"github.com/gorilla/mux"
 )
 

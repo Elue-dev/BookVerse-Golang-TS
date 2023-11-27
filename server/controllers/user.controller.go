@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/elue-dev/bookVerse/connections"
-	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/BookVerse-Golang-TS/connections"
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
 )
 
 func GetUser(userId string) (models.User, error) {

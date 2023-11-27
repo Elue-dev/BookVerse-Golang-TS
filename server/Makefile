@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 EXECUTABLE_DIR := executable
-EXECUTABLE := $(EXECUTABLE_DIR)/bookVerse
+EXECUTABLE := $(EXECUTABLE_DIR)/BookVerse-Golang-TS
 SOURCE_DIR := cmd/web
 
 all: run

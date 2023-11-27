@@ -1,4 +1,4 @@
-module github.com/elue-dev/bookVerse
+module github.com/elue-dev/BookVerse-Golang-TS
 
 go 1.20
 
