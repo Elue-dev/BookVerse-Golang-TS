@@ -18,5 +18,9 @@ func Router() *mux.Router {
 	// BOOK ROUTES
 	router.HandleFunc("/api/books", handlers.GetAllBooks).Methods("GET", "OPTIONS")
 
+	// USER ROUTES
+	router.HandleFunc("/api/users/{id}", handlers.GetSingleUser).Methods("GET", "OPTIONS")
+
+
 	return router
 }
