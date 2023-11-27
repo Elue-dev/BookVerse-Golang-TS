@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -8,9 +9,25 @@ import (
 	"github.com/elue-dev/bookVerse/models"
 )
 
-// func CreateBook() (models.Book, error) {
+func CreateBook(b models.Book) (models.Book, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
 
-// }
+	var book models.Book
+
+	sqlQuery := `INSERT INTO books
+				 (title, description, price, image, userid, slug, category) 
+	 			 VALUES ($1, $2, $3, $3, $5, $6, $7)
+	  			 RETURNING *`
+
+	err := db.QueryRow(sqlQuery, b.Title, b.Description, b.Price, b.Image, b.UserId, b.Slug, b.Category).Scan(&book.ID, &book.Title, &book.Description, &book.Price, &book.Image, &book. UserId, &book.Slug, &book.Category, &book.CreatedAt, &book.UpdatedAt)
+
+	if err != nil {
+		return book, errors.New(err.Error())
+	}
+
+	return book, nil
+}
 
 func GetBooks() ([]models.Book, error) {
 	db := connections.CeateConnection()

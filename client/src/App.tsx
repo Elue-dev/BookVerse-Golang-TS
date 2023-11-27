@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Header from "./components/header/Header";
 // import Unauthenticated from "./components/protect_routes/unauthenticated";
 
 const Home = lazy(() => import("./pages/home/Home"));
@@ -11,9 +12,9 @@ function App() {
     <div className="app">
       <Toaster />
       <BrowserRouter>
-        {/* <Header />
-        <Navlinks />
-        <ScrollToTop /> */}
+        <Header />
+        {/* <Navlinks /> */}
+        {/* <ScrollToTop /> */}
         <div className="main">
           <Suspense
             fallback={
