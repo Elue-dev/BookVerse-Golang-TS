@@ -7,6 +7,7 @@ import (
 
 	"github.com/elue-dev/bookVerse/connections"
 	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/bookVerse/utils"
 )
 
 func CreateBook(b models.Book) (models.Book, error) {
@@ -20,7 +21,9 @@ func CreateBook(b models.Book) (models.Book, error) {
 	 			 VALUES ($1, $2, $3, $3, $5, $6, $7)
 	  			 RETURNING *`
 
-	err := db.QueryRow(sqlQuery, b.Title, b.Description, b.Price, b.Image, b.UserId, b.Slug, b.Category).Scan(&book.ID, &book.Title, &book.Description, &book.Price, &book.Image, &book. UserId, &book.Slug, &book.Category, &book.CreatedAt, &book.UpdatedAt)
+	slug := utils.Slugify(b.Title)
+
+	err := db.QueryRow(sqlQuery, b.Title, b.Description, b.Price, b.Image, b.UserId, slug, b.Category).Scan(&book.ID, &book.Title, &book.Description, &book.Price, &book.Image, &book. UserId, &book.Slug, &book.Category, &book.CreatedAt, &book.UpdatedAt)
 
 	if err != nil {
 		return book, errors.New(err.Error())
