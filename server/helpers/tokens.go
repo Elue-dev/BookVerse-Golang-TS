@@ -33,45 +33,57 @@ func GenerateToken(userID string) (string, error) {
 	return tokenString, nil
 }
 
-func getTokenFromHeaders(r *http.Request) string {
+func getTokenFromHeaders(r *http.Request) (string, error) {
 	headers := r.Header.Get("Authorization")
+	if headers == "" {
+		return "", errors.New("no Authorization headers found")
+	}
+	
 	tokenStr := strings.Split(headers, " ")
-	return tokenStr[1]
+	if len(tokenStr) != 2 {
+		return "", errors.New("headers should follow the pattern: Authorization: Bearer token")
+	}
+	if tokenStr[1] == "" {
+		return "", errors.New("token not found in request headers")
+	}
+
+	return tokenStr[1], nil
 }
 
 func GetUserFromToken(r *http.Request) (models.User, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
-	tokenString := getTokenFromHeaders(r)
-
+	tokenString, err := getTokenFromHeaders(r)
+	if err != nil {
+		return models.User{}, errors.New("you are not authorized. headers should follow the pattern: Authorization: Bearer token")
+	}
     // Parse JWT token
     token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
         return []byte(os.Getenv("JWT_SECRET")), nil
     })
 
     if err != nil {
-        return models.User{}, err
+        return models.User{}, errors.New("token malformed")
     }
 
     if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-        userID, ok := claims["user"].(string)
+        userId, ok := claims["user"].(string)
         if !ok {
-			fmt.Println(userID)
+			fmt.Println(userId)
             return models.User{}, errors.New("invalid token format")
         }
 
-        var user models.User
-        currUser, err := controllers.GetUser(userID)
 
+        currUser, err := controllers.GetUser(userId)
 		if err != nil {
-			return user, err
+			return currUser, err
 		}
 
         return currUser, nil
-    }
-
-    return models.User{}, errors.New("invalid token")
+    } else {
+		return models.User{}, errors.New("invalid token provided")
+	}
 }
 
 

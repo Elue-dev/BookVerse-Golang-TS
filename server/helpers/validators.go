@@ -16,8 +16,8 @@ func ValidateLoginFields(emailOrUsername, password string) bool {
 	}
 }
 
-func ValidateBookFields(title, description, image, userid, category string, price *int ) bool {
-	if title == "" || description == "" || image == "" || userid == "" || category == "" || price == nil {
+func ValidateBookFields(title, description, userid, category string, price *int ) bool {
+	if title == "" || description == "" || userid == "" || category == "" || price == nil {
 		return false
 	} else {
 		return true

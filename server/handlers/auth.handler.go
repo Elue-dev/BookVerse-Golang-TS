@@ -17,7 +17,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(10 << 20)
     if err != nil {
-		helpers.SendErrorResponse(w, 400, "Please provide username, email and password", err.Error())
+		helpers.SendErrorResponse(w,  http.StatusBadRequest, "Please provide username, email and password", err.Error())
         return
     }
 
@@ -27,13 +27,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 
 	if isValidated := helpers.ValidateSignUpFields(user.Username, user.Email, user.Password); !isValidated {
-		helpers.SendErrorResponse(w, 400, "Please provide username, email and password", nil)
+		helpers.SendErrorResponse(w,  http.StatusBadRequest, "Please provide username, email and password", nil)
         return
 	}
 
 	hashedPassword, err := helpers.HashPassword(user.Password)
 	 if err != nil {
-		helpers.SendErrorResponse(w, 400, "Something went wrong in hashing password",  err.Error())
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "Something went wrong in hashing password",  err.Error())
 		 return
 	 }
 
@@ -41,14 +41,14 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	 
 	 file, _, err := r.FormFile("avatar")
 	 if err != nil {
-		helpers.SendErrorResponse(w, 500, "Please provide an avatar",  err.Error())
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Please provide an avatar",  err.Error())
 		return
 	}
 	defer file.Close()
 
 	cld, err := cloudinary.New()
 	if err != nil {
-		helpers.SendErrorResponse(w, 500, "Failed to initialize Cloudinary",  err.Error())
+		helpers.SendErrorResponse(w,  http.StatusInternalServerError, "Failed to initialize Cloudinary",  err.Error())
 		return
 	}
 
@@ -60,7 +60,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		uploader.UploadParams{PublicID: "avatar"})
 
 	if err != nil {
-		helpers.SendErrorResponse(w, 500, "Failed to upload avatar",  err.Error())
+		helpers.SendErrorResponse(w,  http.StatusInternalServerError, "Failed to upload avatar",  err.Error())
 		return
 	}
  
@@ -69,12 +69,12 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	result, err := controllers.RegisterUser(user)
 
 	if err != nil {
-		helpers.SendErrorResponse(w, 500, "Could not create account. Please try again.",  err.Error())
+		helpers.SendErrorResponse(w,  http.StatusInternalServerError, "Could not create account. Please try again.",  err.Error())
 		return
 	}
  
 
-	helpers.SendSuccessResponseWithData(w, 201, result)
+	helpers.SendSuccessResponseWithData(w, http.StatusCreated, result)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -83,13 +83,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&payload)
 
 	if isValidated := helpers.ValidateLoginFields(payload.EmailOrUsername, payload.Password); !isValidated {
-		helpers.SendErrorResponse(w, 400, "Please provide username or email and password", nil)
+		helpers.SendErrorResponse(w,  http.StatusBadRequest, "Please provide username or email and password", nil)
         return
 	}
 
 	currUser, err := controllers.LoginUser(payload)
 	if err != nil {
-		 helpers.SendErrorResponse(w, 400, "Invalid credentials provided", err.Error())
+		 helpers.SendErrorResponse(w,  http.StatusBadRequest, "Invalid credentials provided", err.Error())
 		 return
 	}
 
@@ -97,13 +97,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
     if currUser.ID != "" && helpers.ComparePasswordWithHash(currUser.Password, payload.Password) {
         token, err := helpers.GenerateToken(currUser.ID)
         if err != nil {
-            helpers.SendErrorResponse(w, 500, "Error creating token", err.Error())
+            helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
             return
         }
-        helpers.SendLoginSuccessResponse(w, 200, currUser, token)
+        helpers.SendLoginSuccessResponse(w, http.StatusOK, currUser, token)
     } else {
         // Handle the case where currUser is nil or password is incorrect
-        helpers.SendErrorResponse(w, 400, "Invalid credentials provided", nil)
+        helpers.SendErrorResponse(w,  http.StatusBadRequest, "Invalid credentials provided", nil)
 		return
     }
 }
