@@ -58,7 +58,7 @@ export default function Featured() {
             {books?.slice(0, 3).map((book) => (
               <div className={styles["books__card"]} key={book.id}>
                 <div>
-                  <img src={book.img} alt="" />
+                  <img src={book.image} alt="" />
                 </div>
                 <div className={styles["book__details"]}>
                   <h3>{book.title}</h3>
