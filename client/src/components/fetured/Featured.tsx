@@ -35,6 +35,8 @@ export default function Featured() {
   if (error)
     return <div className={styles.featured}>SOMETHING WENT WRONG...</div>;
 
+  // if loading ???
+
   return (
     <section className={styles.featured}>
       <div>

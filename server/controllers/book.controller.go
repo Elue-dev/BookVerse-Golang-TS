@@ -18,10 +18,7 @@ func CreateBook(b models.Book) (models.Book, error) {
 
 	var book models.Book
 
-	sqlQuery := `INSERT INTO books
-				 (title, description, price, image, userid, slug, category) 
-	 			 VALUES ($1, $2, $3, $4, $5, $6, $7)
-	  			 RETURNING *`
+	sqlQuery := "INSERT INTO books (title, description, price, image, userid, slug, category)  VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"
 
 	slug := utils.Slugify(b.Title)
 
@@ -46,7 +43,7 @@ func GetBooks() ([]models.Book, error) {
 
 	var books []models.Book
 
-	sqlQuery := "SELECT * FROM books"
+	sqlQuery := "SELECT * FROM books ORDER BY createdat desc"
 	rows, err := db.Query(sqlQuery)
 
 	if err != nil {
@@ -96,4 +93,23 @@ func GetBook(bookId string) (models.Book, error) {
 	}
 
 	return book, nil
+}
+
+func ModifyBook(todoId string, b models.Book) (int64, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery := "UPDATE books SET title = $2, description = $3, price = $4, image = $5, category = $6 WHERE id = $1"
+
+	res, err := db.Exec(sqlQuery, todoId, b.Title, b.Description, b.Price, b.Image, b.Category)
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	return rowsAffected, nil
 }

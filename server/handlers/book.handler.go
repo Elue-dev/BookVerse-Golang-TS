@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/elue-dev/bookVerse/controllers"
 	"github.com/elue-dev/bookVerse/helpers"
 	"github.com/elue-dev/bookVerse/models"
+	"github.com/elue-dev/bookVerse/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -108,4 +110,97 @@ func GetSingleBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendSuccessResponseWithData(w, http.StatusOK, currBook)
+}
+
+func UpdateBook(w http.ResponseWriter, r *http.Request) {
+	var book models.Book
+	bookId := mux.Vars(r)["id"]
+
+	currUser, err := helpers.GetUserFromToken(r)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusUnauthorized, "You are not authorized", err.Error())
+		return
+	}
+
+	currBook, err := controllers.GetBook(bookId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
+		return
+	}
+
+	if currUser.ID != currBook.UserId {
+		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only update books you added", "user id and book userId do not match")
+		return
+	}
+
+	title := r.FormValue("title")
+	description := r.FormValue("description")
+	category := r.FormValue("category")
+	priceStr := r.FormValue("price")
+	imageFile, _, _ := r.FormFile("image")
+
+	fmt.Println("title", title)
+	fmt.Println("description", description)
+	fmt.Println("category", category)
+	fmt.Println("priceStr", priceStr)
+	fmt.Println("imageFile", imageFile)
+
+	book.Title = utils.UpdateFieldBasedOfValuePresence(title, currBook.Title).(string)
+	book.Description = utils.UpdateFieldBasedOfValuePresence(description, currBook.Description).(string)
+	book.Category = utils.UpdateFieldBasedOfValuePresence(category, currBook.Category).(string)
+
+	msg := "Please provide at least one field to update (title, description, category, price, image)"
+
+	if isValidated := helpers.ValidateBookFieldsForUpdate(title, description, category, priceStr, imageFile); !isValidated {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, msg, "no field was provided for an update")
+		return
+	}
+
+	price, err := strconv.Atoi(priceStr)
+	if err != nil {
+		book.Price = currBook.Price
+	} else {
+		book.Price = price
+	}
+
+	file, _, err := r.FormFile("image")
+	if err != nil {
+		book.Image = currBook.Image
+	} else {
+		if file != nil {
+			cld, err := cloudinary.New()
+			if err != nil {
+				helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary", err.Error())
+				return
+			}
+
+			var ctx = context.Background()
+			uploadResult, err := cld.Upload.Upload(
+				ctx,
+				file,
+				uploader.UploadParams{PublicID: "book image"})
+
+			if err != nil {
+				helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar", err.Error())
+				return
+			}
+
+			book.Image = uploadResult.SecureURL
+		}
+
+	}
+
+	defer func() {
+		if file != nil {
+			file.Close()
+		}
+	}()
+
+	_, err = controllers.ModifyBook(currBook.ID, book)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not update book", err.Error())
+		return
+	}
+
+	helpers.SendSuccessResponse(w, http.StatusOK, "Book updated successfully")
 }

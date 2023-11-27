@@ -16,3 +16,10 @@ func Slugify(text string) string {
 
 	return text
 }
+
+func UpdateFieldBasedOfValuePresence(newVal interface{}, oldVal interface{}) interface{} {
+	if newVal != "" {
+		return newVal
+	}
+	return oldVal
+}

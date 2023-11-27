@@ -23,3 +23,11 @@ func ValidateBookFields(title, description, userid, category string, price *int)
 		return true
 	}
 }
+
+func ValidateBookFieldsForUpdate(title, description, category string, price interface{}, image interface{}) bool {
+	if title == "" && description == "" && category == "" && price == "" && image == nil {
+		return false
+	} else {
+		return true
+	}
+}

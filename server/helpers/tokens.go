@@ -76,7 +76,7 @@ func GetUserFromToken(r *http.Request) (models.User, error) {
 
 		currUser, err := controllers.GetUser(userId)
 		if err != nil {
-			return currUser, err
+			return models.User{}, err
 		}
 
 		return currUser, nil
