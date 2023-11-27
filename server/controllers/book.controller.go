@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -65,4 +66,35 @@ func GetBooks() ([]models.Book, error) {
 	}
 
 	return books, nil
+}
+
+func GetBook(bookId string) (models.Book, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	var book models.Book
+
+	sqlQuery := "SELECT * FROM books WHERE id = $1"
+
+	rows := db.QueryRow(sqlQuery, bookId)
+
+	err := rows.Scan(&book.ID, &book.Title, &book.Description, &book.Price, &book.Image, &book.UserId, &book.Slug, &book.Category, &book.CreatedAt, &book.UpdatedAt)
+
+
+	switch err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned.")
+			return book, fmt.Errorf("book with id of %v could not be found", bookId)
+		case nil:
+			return book, nil
+		default:
+			fmt.Println("No rows were returned.")
+			if pqErr, ok := err.(*pq.Error); ok {
+				if pqErr.Code == "22P02" {
+					return book, fmt.Errorf("book with id of %v could not be found", bookId)
+				}
+			}
+	}
+
+	return book, nil
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/elue-dev/bookVerse/controllers"
 	"github.com/elue-dev/bookVerse/helpers"
 	"github.com/elue-dev/bookVerse/models"
+	"github.com/gorilla/mux"
 )
 
 func GetAllBooks(w http.ResponseWriter, r *http.Request) {
@@ -94,4 +95,17 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendSuccessResponseWithData(w, http.StatusCreated, newBook)
+}
+
+func GetSingleBook(w http.ResponseWriter, r *http.Request) {
+	bookId := mux.Vars(r)["id"]
+
+	currBook, err := controllers.GetBook(bookId)
+
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
+		return
+	}
+
+	helpers.SendSuccessResponseWithData(w, http.StatusOK, currBook)
 }
