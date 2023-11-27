@@ -24,6 +24,5 @@ func Router() *mux.Router {
 	// USER ROUTES
 	router.HandleFunc("/api/users/{id}", handlers.GetSingleUser).Methods("GET", "OPTIONS")
 
-
 	return router
 }

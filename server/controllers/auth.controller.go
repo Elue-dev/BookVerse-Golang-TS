@@ -35,22 +35,22 @@ func LoginUser(p models.LoginPayload) (models.User, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
-	sqlQuery :=  `SELECT * FROM users
+	sqlQuery := `SELECT * FROM users
 				  WHERE lower(email) = $1 
-				  OR lower(username) = $2`;
+				  OR lower(username) = $2`
 
-    var user models.User
+	var user models.User
 
 	rows := db.QueryRow(sqlQuery, strings.ToLower(p.EmailOrUsername), strings.ToLower(p.EmailOrUsername))
 	err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Avatar, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
-        if err == sql.ErrNoRows {
-            return user, errors.New("invalid credentials provided")
-        }
-        fmt.Printf("Failed to scan row: %v", err)
-        return user, errors.New(err.Error())
-    }
+		if err == sql.ErrNoRows {
+			return user, errors.New("invalid credentials provided")
+		}
+		fmt.Printf("Failed to scan row: %v", err)
+		return user, errors.New(err.Error())
+	}
 
 	return user, nil
 }

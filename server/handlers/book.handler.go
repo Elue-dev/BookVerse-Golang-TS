@@ -15,7 +15,7 @@ import (
 
 func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	result, err := controllers.GetBooks()
-	
+
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Something went wrong while fetching books", err)
 	}
@@ -33,7 +33,7 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	book.Title = r.FormValue("title")
-    book.Description = r.FormValue("description")
+	book.Description = r.FormValue("description")
 	book.UserId = currUser.ID
 	book.Category = r.FormValue("category")
 	priceStr := r.FormValue("price")
@@ -42,7 +42,7 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 
 	if isValidated := helpers.ValidateBookFields(book.Title, book.Description, book.UserId, book.Category, &book.Price); !isValidated {
 		helpers.SendErrorResponse(w, http.StatusBadRequest, msg, "all fields are required")
-        return
+		return
 	}
 
 	price, err := strconv.Atoi(priceStr)
@@ -55,14 +55,14 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = r.ParseMultipartForm(10 << 20)
-    if err != nil {
+	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusBadRequest, msg, err.Error())
-        return
-    }
+		return
+	}
 
 	file, _, err := r.FormFile("image")
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide the book image",  "book image was not provided in the request body")
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide the book image", "book image was not provided in the request body")
 		return
 	}
 
@@ -70,7 +70,7 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 
 	cld, err := cloudinary.New()
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary",  err.Error())
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary", err.Error())
 		return
 	}
 
@@ -81,16 +81,16 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 		uploader.UploadParams{PublicID: "book image"})
 
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar",  err.Error())
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar", err.Error())
 		return
 	}
- 
+
 	book.Image = uploadResult.SecureURL
 
 	newBook, err := controllers.CreateBook(book)
 
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not create book",  err.Error())
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not create book", err.Error())
 		return
 	}
 

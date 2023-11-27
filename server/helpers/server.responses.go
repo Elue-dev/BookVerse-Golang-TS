@@ -7,7 +7,7 @@ import (
 	"github.com/elue-dev/bookVerse/models"
 )
 
-func SendSuccessResponse (w http.ResponseWriter, statusCode int, message string) {
+func SendSuccessResponse(w http.ResponseWriter, statusCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(statusCode)
@@ -23,7 +23,7 @@ func SendSuccessResponseWithData(w http.ResponseWriter, statusCode int, data int
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(models.SuccessResponseWithData{
 		Success: true,
-		Data: data,
+		Data:    data,
 	})
 }
 
@@ -33,18 +33,18 @@ func SendLoginSuccessResponse(w http.ResponseWriter, statusCode int, data interf
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(models.LoginResponse{
 		Success: true,
-		Token: token,
-		Data: data,
+		Token:   token,
+		Data:    data,
 	})
 }
 
-func SendErrorResponse (w http.ResponseWriter, statusCode int, errorMsg string, error interface{}) {
+func SendErrorResponse(w http.ResponseWriter, statusCode int, errorMsg string, error interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(models.ErrResponse{
-		Success: false,
-		Message: errorMsg,
+		Success:      false,
+		Message:      errorMsg,
 		ErrorDetails: error,
 	})
 }

@@ -7,16 +7,14 @@ import (
 	"github.com/elue-dev/bookVerse/helpers"
 )
 
-
 type contextKey string
 
 const userKey contextKey = "user"
 
-
 func VerifyAuthStatus(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := helpers.GetUserFromToken(r)
-		
+
 		if err != nil {
 			helpers.SendErrorResponse(w, http.StatusUnauthorized, "You are not authorized", err.Error())
 			return

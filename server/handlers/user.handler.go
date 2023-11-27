@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetSingleUser (w http.ResponseWriter, r *http.Request) {
+func GetSingleUser(w http.ResponseWriter, r *http.Request) {
 	userId := mux.Vars(r)["id"]
 
 	currUser, err := controllers.GetUser(userId)

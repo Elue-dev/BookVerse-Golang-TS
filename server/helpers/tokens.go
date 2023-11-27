@@ -38,7 +38,7 @@ func getTokenFromHeaders(r *http.Request) (string, error) {
 	if headers == "" {
 		return "", errors.New("no Authorization headers found")
 	}
-	
+
 	tokenStr := strings.Split(headers, " ")
 	if len(tokenStr) != 2 {
 		return "", errors.New("headers should follow the pattern: Authorization: Bearer token")
@@ -58,33 +58,29 @@ func GetUserFromToken(r *http.Request) (models.User, error) {
 	if err != nil {
 		return models.User{}, errors.New("you are not authorized. headers should follow the pattern: Authorization: Bearer token")
 	}
-    // Parse JWT token
-    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-        return []byte(os.Getenv("JWT_SECRET")), nil
-    })
+	// Parse JWT token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
 
-    if err != nil {
-        return models.User{}, errors.New("token malformed")
-    }
+	if err != nil {
+		return models.User{}, errors.New("token malformed")
+	}
 
-    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-        userId, ok := claims["user"].(string)
-        if !ok {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userId, ok := claims["user"].(string)
+		if !ok {
 			fmt.Println(userId)
-            return models.User{}, errors.New("invalid token format")
-        }
+			return models.User{}, errors.New("invalid token format")
+		}
 
-
-        currUser, err := controllers.GetUser(userId)
+		currUser, err := controllers.GetUser(userId)
 		if err != nil {
 			return currUser, err
 		}
 
-        return currUser, nil
-    } else {
+		return currUser, nil
+	} else {
 		return models.User{}, errors.New("invalid token provided")
 	}
 }
-
-
-

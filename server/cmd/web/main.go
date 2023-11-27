@@ -14,7 +14,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-	  log.Fatal("Error loading .env file")
+		log.Fatal("Error loading .env file")
 	}
 
 	PORT := os.Getenv("PORT")
@@ -27,9 +27,9 @@ func main() {
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
-	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})	
+	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
 
 	fmt.Println("Go server running on port " + PORT)
-	log.Fatal(http.ListenAndServe(":"+ PORT, handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(r)))
+	log.Fatal(http.ListenAndServe(":"+PORT, handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(r)))
 
 }
