@@ -2,7 +2,7 @@
 
 EXECUTABLE_DIR := executable
 EXECUTABLE := $(EXECUTABLE_DIR)/BookVerse-Golang-TS
-SOURCE_DIR := cmd/web
+SOURCE_DIR := .
 
 all: run
 
