@@ -19,7 +19,13 @@ func GetUser(userId string) (models.User, error) {
 
 	rows := db.QueryRow(sqlQuery, userId)
 
-	err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Avatar, &user.CreatedAt, &user.UpdatedAt)
+	err := rows.Scan(&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Avatar,
+		&user.CreatedAt,
+		&user.UpdatedAt)
 
 	switch err {
 	case sql.ErrNoRows:
