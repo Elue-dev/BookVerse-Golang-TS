@@ -24,10 +24,12 @@ import { Book } from "../../types/books";
 import { errorToast, successToast } from "../../utils/alerts";
 import { User } from "../../types/user";
 import { RootState } from "../../redux/store";
+import Comments from "../../components/comments/Comments";
 
 export default function BookDetail() {
   // const [isPurchased, setIsPurchased] = useState(false);
   const { slug, bookId } = useParams();
+
   const currentUser: User | null = useSelector<RootState, User | null>(
     getCurrentUser
   );
@@ -270,9 +272,9 @@ export default function BookDetail() {
           )} */}
         </div>
 
-        {/* <div className={styles["comments__container"]}>
-          <Comments bookId={book.id} />
-        </div> */}
+        <div className={styles["comments__container"]}>
+          <Comments bookId={book?.id || undefined} />
+        </div>
       </div>
       <div className={styles["right__section"]}>
         <h2>Similar Books</h2>

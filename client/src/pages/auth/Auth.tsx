@@ -82,9 +82,10 @@ export default function Auth() {
 
     try {
       const response = await httpRequest.post("/auth/login", credentials);
+
       setLoading(false);
-      dispatch(SET_ACTIVE_USER(response.data.user));
-      dispatch(SET_USER_TOKEN(response.data.accessToken));
+      dispatch(SET_ACTIVE_USER(response.data.data));
+      dispatch(SET_USER_TOKEN(response.data.token));
 
       if (response && previousURL?.includes("book")) {
         navigate(-1);

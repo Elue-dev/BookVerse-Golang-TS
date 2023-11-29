@@ -68,10 +68,10 @@ func GetCommentsForBook(bookId string) ([]models.CommentWithUserFields, error) {
 			&comment.Message,
 			&comment.UserId,
 			&comment.BookId,
-			&comment.Username,
-			&comment.UserImg,
 			&comment.CreatedAt,
 			&comment.UpdatedAt,
+			&comment.Username,
+			&comment.UserImg,
 		)
 		if err != nil {
 			return comments, err
@@ -80,5 +80,25 @@ func GetCommentsForBook(bookId string) ([]models.CommentWithUserFields, error) {
 	}
 
 	return comments, nil
+}
 
+func ModifyComment(commentId, message string) (int64, error) {
+
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery := "UPDATE comments SET message = $2 WHERE id = $1"
+
+	res, err := db.Exec(sqlQuery, commentId, message)
+
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	return rowsAffected, nil
 }

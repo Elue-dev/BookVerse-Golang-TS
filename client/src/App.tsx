@@ -36,7 +36,7 @@ function App() {
                   // </Unauthenticated>
                 }
               />
-              <Route path="/book/:slug/:id" element={<BookDetail />} />
+              <Route path="/book/:slug/:bookId" element={<BookDetail />} />
               <Route path="/books" element={<Books />} />
               {/* <Route
                 path="/auth"

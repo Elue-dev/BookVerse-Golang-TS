@@ -233,12 +233,6 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 func GetBooksByUser(w http.ResponseWriter, r *http.Request) {
 	userId := mux.Vars(r)["id"]
 
-	_, err := helpers.GetUserFromToken(r)
-	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusUnauthorized, "You are not authorized", err.Error())
-		return
-	}
-
 	books, err := controllers.GetUserBooks(userId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not get books for this user", err.Error())

@@ -33,7 +33,9 @@ func CreateBook(b models.Book) (models.Book, error) {
 		b.Image,
 		b.UserId,
 		slug,
-		b.Category).
+		b.Category,
+		b.UserImg,
+	).
 		Scan(&book.ID,
 			&book.Title,
 			&book.Description,
