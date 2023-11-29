@@ -20,6 +20,12 @@ type Book struct {
 	Category    string `json:"category"`
 	CreatedAt   string `json:"created_at"`
 	UpdatedAt   string `json:"updated_at"`
+	UserImg     string `json:"user_img"`
+}
+
+type BookWithUsername struct {
+	Book
+	Username string `json:"username"`
 }
 
 type LoginPayload struct {

@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
+import BookDetail from "./pages/book_detail/BookDetail";
 // import Unauthenticated from "./components/protect_routes/unauthenticated";
 
 const Home = lazy(() => import("./pages/home/Home"));
@@ -34,6 +35,7 @@ function App() {
                   // </Unauthenticated>
                 }
               />
+              <Route path="/book/:slug" element={<BookDetail />} />
               {/* <Route
                 path="/auth"
                 element={
@@ -42,7 +44,6 @@ function App() {
                   </Unauthenticated>
                 }
               />
-              <Route path="/book/:slug" element={<BookDetail />} />
               <Route path="/books" element={<Books />} />
 
               <Route path="/add-book" element={<AddBook />} />

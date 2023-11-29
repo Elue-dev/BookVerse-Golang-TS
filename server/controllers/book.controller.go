@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/elue-dev/BookVerse-Golang-TS/connections"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
@@ -20,8 +19,8 @@ func CreateBook(b models.Book) (models.Book, error) {
 
 	sqlQuery := `
 		INSERT INTO books 
-		(title, description, price, image, userid, slug, category) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+		(title, description, price, image, userid, slug, category, user_img) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
 	 `
 
 	slug := utils.Slugify(b.Title)
@@ -43,7 +42,9 @@ func CreateBook(b models.Book) (models.Book, error) {
 			&book.Slug,
 			&book.Category,
 			&book.CreatedAt,
-			&book.UpdatedAt)
+			&book.UpdatedAt,
+			&book.UserImg,
+		)
 
 	if err != nil {
 		if pgErr, ok := err.(*pq.Error); ok {
@@ -58,13 +59,13 @@ func CreateBook(b models.Book) (models.Book, error) {
 	return book, nil
 }
 
-func GetBooks() ([]models.Book, error) {
+func GetBooks() ([]models.BookWithUsername, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
-	var books []models.Book
+	var books []models.BookWithUsername
 
-	sqlQuery := "SELECT * FROM books ORDER BY createdat desc"
+	sqlQuery := "SELECT b.*, u.username FROM books b JOIN users u ON b.userid = u.id ORDER BY createdat DESC"
 	rows, err := db.Query(sqlQuery)
 
 	if err != nil {
@@ -75,8 +76,9 @@ func GetBooks() ([]models.Book, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var book models.Book
-		err = rows.Scan(&book.ID,
+		var book models.BookWithUsername
+		err = rows.Scan(
+			&book.ID,
 			&book.Title,
 			&book.Description,
 			&book.Price,
@@ -85,9 +87,12 @@ func GetBooks() ([]models.Book, error) {
 			&book.Slug,
 			&book.Category,
 			&book.CreatedAt,
-			&book.UpdatedAt)
+			&book.UpdatedAt,
+			&book.UserImg,
+			&book.Username,
+		)
 		if err != nil {
-			log.Fatalf("Could not scan rows %v", err)
+			return books, err
 		}
 		books = append(books, book)
 	}
@@ -114,7 +119,9 @@ func GetBook(bookSlug string) (models.Book, error) {
 		&book.Slug,
 		&book.Category,
 		&book.CreatedAt,
-		&book.UpdatedAt)
+		&book.UpdatedAt,
+		&book.UserImg,
+	)
 
 	switch err {
 	case sql.ErrNoRows:
@@ -150,7 +157,8 @@ func ModifyBook(todoId string, b models.Book) (int64, error) {
 		b.Description,
 		b.Price,
 		b.Image,
-		b.Category)
+		b.Category,
+	)
 	if err != nil {
 		return 0, errors.New(err.Error())
 	}
@@ -208,7 +216,9 @@ func GetUserBooks(userId string) ([]models.Book, error) {
 			&book.Slug,
 			&book.Category,
 			&book.CreatedAt,
-			&book.UpdatedAt)
+			&book.UpdatedAt,
+			&book.UserImg,
+		)
 		if err != nil {
 			return books, err
 		}

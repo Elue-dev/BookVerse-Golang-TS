@@ -77,7 +77,7 @@ export default function Hero() {
                   onClick={clearFields}
                 >
                   <div className={styles["search__details"]}>
-                    <img src={book.img} />
+                    <img src={book.image} />
                     <div>
                       <p>{book.title}</p>
                       <p>₦{book.price}</p>

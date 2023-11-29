@@ -19,6 +19,7 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Something went wrong while fetching books", err)
+		return
 	}
 
 	helpers.SendSuccessResponseWithData(w, http.StatusOK, result)
@@ -36,6 +37,7 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 	book.Title = r.FormValue("title")
 	book.Description = r.FormValue("description")
 	book.UserId = currUser.ID
+	book.UserImg = currUser.Avatar
 	book.Category = r.FormValue("category")
 	priceStr := r.FormValue("price")
 
