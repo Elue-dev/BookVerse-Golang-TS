@@ -95,15 +95,15 @@ func GetBooks() ([]models.Book, error) {
 	return books, nil
 }
 
-func GetBook(bookId string) (models.Book, error) {
+func GetBook(bookSlug string) (models.Book, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
 	var book models.Book
 
-	sqlQuery := "SELECT * FROM books WHERE id = $1"
+	sqlQuery := "SELECT * FROM books WHERE slug = $1"
 
-	rows := db.QueryRow(sqlQuery, bookId)
+	rows := db.QueryRow(sqlQuery, bookSlug)
 
 	err := rows.Scan(&book.ID,
 		&book.Title,
@@ -119,14 +119,14 @@ func GetBook(bookId string) (models.Book, error) {
 	switch err {
 	case sql.ErrNoRows:
 		fmt.Println("No rows were returned.")
-		return book, fmt.Errorf("book with id of %v could not be found", bookId)
+		return book, fmt.Errorf("book with slug of %v could not be found", bookSlug)
 	case nil:
 		return book, nil
 	default:
 		fmt.Println("No rows were returned.")
 		if pqErr, ok := err.(*pq.Error); ok {
 			if pqErr.Code == "22P02" {
-				return book, fmt.Errorf("book with id of %v could not be found", bookId)
+				return book, fmt.Errorf("book with slug of %v could not be found", bookSlug)
 			}
 		}
 	}

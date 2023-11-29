@@ -99,9 +99,9 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSingleBook(w http.ResponseWriter, r *http.Request) {
-	bookId := mux.Vars(r)["id"]
+	bookSlug := mux.Vars(r)["slug"]
 
-	currBook, err := controllers.GetBook(bookId)
+	currBook, err := controllers.GetBook(bookSlug)
 
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
