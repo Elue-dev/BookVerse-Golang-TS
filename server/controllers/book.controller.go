@@ -102,9 +102,13 @@ func GetBooks() ([]models.BookWithUsername, error) {
 }
 
 func GetBook(bookSlug, bookId string) (models.Book, error) {
+	if bookId == "" {
+		return models.Book{}, errors.New("book id cannot be empty")
+	}
+
 	_, err := uuid.Parse(bookId)
 	if err != nil {
-		return models.Book{}, fmt.Errorf("book_id of %v does not match the expected format", bookId)
+		return models.Book{}, fmt.Errorf("book id of %v does not match the expected format", bookId)
 	}
 
 	db := connections.CeateConnection()
@@ -214,7 +218,8 @@ func GetUserBooks(userId string) ([]models.Book, error) {
 
 	for rows.Next() {
 		var book models.Book
-		err = rows.Scan(&book.ID,
+		err = rows.Scan(
+			&book.ID,
 			&book.Title,
 			&book.Description,
 			&book.Price,

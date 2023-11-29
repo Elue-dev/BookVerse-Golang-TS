@@ -38,3 +38,47 @@ func AddComment(c models.Comment) (models.Comment, error) {
 
 	return comment, nil
 }
+
+func GetCommentsForBook(bookId string) ([]models.CommentWithUserFields, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	var comments []models.CommentWithUserFields
+
+	sqlQuery :=
+		`
+		 SELECT c.*, u.username, u.avatar AS userImg FROM comments c
+		 JOIN users u 
+		 ON c.userid = u.id 
+		 WHERE c.bookid = $1 
+		 ORDER BY createdat desc
+		`
+
+	rows, err := db.Query(sqlQuery, bookId)
+	if err != nil {
+		return comments, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var comment models.CommentWithUserFields
+		err = rows.Scan(
+			&comment.ID,
+			&comment.Message,
+			&comment.UserId,
+			&comment.BookId,
+			&comment.Username,
+			&comment.UserImg,
+			&comment.CreatedAt,
+			&comment.UpdatedAt,
+		)
+		if err != nil {
+			return comments, err
+		}
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+
+}

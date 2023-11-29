@@ -41,3 +41,8 @@ type Comment struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
+type CommentWithUserFields struct {
+	Comment
+	Username string `json:"username"`
+	UserImg  string `json:"user_img"`
+}

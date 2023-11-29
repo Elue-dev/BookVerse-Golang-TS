@@ -27,7 +27,7 @@ import { RootState } from "../../redux/store";
 
 export default function BookDetail() {
   // const [isPurchased, setIsPurchased] = useState(false);
-  const { slug } = useParams();
+  const { slug, bookId } = useParams();
   const currentUser: User | null = useSelector<RootState, User | null>(
     getCurrentUser
   );
@@ -39,7 +39,7 @@ export default function BookDetail() {
   const authHeaders = { headers: { authorization: `Bearer ${token}` } };
 
   const queryFn = async (): Promise<Book> => {
-    const response = await httpRequest.get(`/books/${slug}`);
+    const response = await httpRequest.get(`/books/${slug}/${bookId}`);
     return response.data.data;
   };
 

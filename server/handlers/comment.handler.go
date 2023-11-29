@@ -8,6 +8,7 @@ import (
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	"github.com/gorilla/mux"
 )
 
 func CreateComment(w http.ResponseWriter, r *http.Request) {
@@ -25,12 +26,12 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 
 	_, err = controllers.GetBook("", comment.BookId)
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided id not found", fmt.Sprintf("Could not find book with id %v", comment.BookId))
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided id not found", err.Error())
 		return
 	}
 
 	if isValidated := helpers.ValidateCommentFields(comment.Message, comment.BookId); !isValidated {
-		helpers.SendErrorResponse(w, http.StatusBadRequest, "message,and book id are both required", "mising fields were detacted: message, book_id")
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "message and book id are both required", "mising fields were detacted: message, book_id")
 		return
 	}
 
@@ -41,4 +42,22 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendSuccessResponse(w, http.StatusCreated, "Comment added successfully")
+}
+
+func GetBookComments(w http.ResponseWriter, r *http.Request) {
+	bookId := mux.Vars(r)["bookId"]
+
+	currBook, err := controllers.GetBook("", bookId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided book id not found", err.Error())
+		return
+	}
+
+	books, err := controllers.GetCommentsForBook(bookId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, fmt.Sprintf("Could not get comments for this book: %v", currBook.Title), err.Error())
+		return
+	}
+
+	helpers.SendSuccessResponseWithData(w, http.StatusOK, books)
 }

@@ -70,7 +70,7 @@ export default function Featured() {
                   </p>
                   <p>{book.description.substring(0, 90)}...</p>
                   <div className={styles.bottom}>
-                    <Link to={`/book/${book.slug}`}>
+                    <Link to={`/book/${book.slug}/${book.id}`}>
                       <button>See Details</button>
                     </Link>
                     <p>₦{new Intl.NumberFormat().format(book.price)}</p>
