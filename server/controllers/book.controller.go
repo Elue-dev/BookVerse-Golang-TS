@@ -181,3 +181,39 @@ func DeleteBook(todoId string) (int64, error) {
 
 	return rowsAffected, nil
 }
+
+func GetUserBooks(userId string) ([]models.Book, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	var books []models.Book
+
+	sqlQuery := "SELECT * FROM books WHERE userid = $1 ORDER BY createdat desc"
+
+	rows, err := db.Query(sqlQuery, userId)
+	if err != nil {
+		return books, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var book models.Book
+		err = rows.Scan(&book.ID,
+			&book.Title,
+			&book.Description,
+			&book.Price,
+			&book.Image,
+			&book.UserId,
+			&book.Slug,
+			&book.Category,
+			&book.CreatedAt,
+			&book.UpdatedAt)
+		if err != nil {
+			return books, err
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
+}

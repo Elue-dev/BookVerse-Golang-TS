@@ -39,3 +39,12 @@ func GetUser(userId string) (models.User, error) {
 
 	return user, nil
 }
+
+// func GetUsers() (models.User, error) {
+// 	db := connections.CeateConnection()
+// 	defer db.Close()
+
+// 	var user models.User
+
+// 	sqlQuery := "SELECT * FROM users WHERE id = $1"
+// }

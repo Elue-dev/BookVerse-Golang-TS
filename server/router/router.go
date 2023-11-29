@@ -22,6 +22,7 @@ func Router() *mux.Router {
 	router.HandleFunc("/api/books/{id}", handlers.GetSingleBook).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/books/{id}", middlewares.VerifyAuthStatus(handlers.UpdateBook)).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/api/books/{id}", middlewares.VerifyAuthStatus(handlers.DeleteBook)).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/api/books/user/{id}", middlewares.VerifyAuthStatus(handlers.GetBooksByUser)).Methods("GET", "OPTIONS")
 
 	// USER ROUTES
 	router.HandleFunc("/api/users/{id}", handlers.GetSingleUser).Methods("GET", "OPTIONS")
