@@ -26,7 +26,14 @@ func CreateBook(b models.Book) (models.Book, error) {
 
 	slug := utils.Slugify(b.Title)
 
-	err := db.QueryRow(sqlQuery, b.Title, b.Description, b.Price, b.Image, b.UserId, slug, b.Category).
+	err := db.QueryRow(sqlQuery,
+		b.Title,
+		b.Description,
+		b.Price,
+		b.Image,
+		b.UserId,
+		slug,
+		b.Category).
 		Scan(&book.ID,
 			&book.Title,
 			&book.Description,
@@ -144,6 +151,25 @@ func ModifyBook(todoId string, b models.Book) (int64, error) {
 		b.Price,
 		b.Image,
 		b.Category)
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	return rowsAffected, nil
+}
+
+func DeleteBook(todoId string) (int64, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery := "DELETE FROM books WHERE id = $1"
+
+	res, err := db.Exec(sqlQuery, todoId)
 	if err != nil {
 		return 0, errors.New(err.Error())
 	}

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -139,12 +138,6 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	priceStr := r.FormValue("price")
 	imageFile, _, _ := r.FormFile("image")
 
-	fmt.Println("title", title)
-	fmt.Println("description", description)
-	fmt.Println("category", category)
-	fmt.Println("priceStr", priceStr)
-	fmt.Println("imageFile", imageFile)
-
 	book.Title = utils.UpdateFieldBasedOfValuePresence(title, currBook.Title).(string)
 	book.Description = utils.UpdateFieldBasedOfValuePresence(description, currBook.Description).(string)
 	book.Category = utils.UpdateFieldBasedOfValuePresence(category, currBook.Category).(string)
@@ -203,4 +196,32 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendSuccessResponse(w, http.StatusOK, "Book updated successfully")
+}
+
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
+	bookId := mux.Vars(r)["id"]
+
+	currUser, err := helpers.GetUserFromToken(r)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusUnauthorized, "You are not authorized", err.Error())
+		return
+	}
+
+	currBook, err := controllers.GetBook(bookId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
+		return
+	}
+
+	if currUser.ID != currBook.UserId {
+		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only delete books you added", "user id and book userId do not match")
+		return
+	}
+
+	_, err = controllers.DeleteBook(bookId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not delete book", err.Error())
+	}
+
+	helpers.SendSuccessResponse(w, http.StatusOK, "Book deleted successfully")
 }
