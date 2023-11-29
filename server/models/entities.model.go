@@ -32,3 +32,12 @@ type LoginPayload struct {
 	EmailOrUsername string `json:"emailOrUsername"`
 	Password        string `json:"password"`
 }
+
+type Comment struct {
+	ID        string `json:"id"`
+	Message   string `json:"message"`
+	UserId    string `json:"user_id"`
+	BookId    string `json:"book_id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}

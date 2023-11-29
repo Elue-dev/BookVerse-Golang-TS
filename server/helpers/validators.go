@@ -31,3 +31,11 @@ func ValidateBookFieldsForUpdate(title, description, category string, price inte
 		return true
 	}
 }
+
+func ValidateCommentFields(message, bookId string) bool {
+	if message == "" || bookId == "" {
+		return false
+	} else {
+		return true
+	}
+}

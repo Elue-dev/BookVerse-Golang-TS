@@ -8,6 +8,7 @@ import (
 	"github.com/elue-dev/BookVerse-Golang-TS/connections"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
 	"github.com/elue-dev/BookVerse-Golang-TS/utils"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -100,17 +101,22 @@ func GetBooks() ([]models.BookWithUsername, error) {
 	return books, nil
 }
 
-func GetBook(bookSlug string) (models.Book, error) {
+func GetBook(bookSlug, bookId string) (models.Book, error) {
+	_, err := uuid.Parse(bookId)
+	if err != nil {
+		return models.Book{}, fmt.Errorf("book_id of %v does not match the expected format", bookId)
+	}
+
 	db := connections.CeateConnection()
 	defer db.Close()
 
 	var book models.Book
 
-	sqlQuery := "SELECT * FROM books WHERE slug = $1"
+	sqlQuery := "SELECT * FROM books WHERE slug = $1 OR id = $2"
 
-	rows := db.QueryRow(sqlQuery, bookSlug)
+	rows := db.QueryRow(sqlQuery, bookSlug, bookId)
 
-	err := rows.Scan(&book.ID,
+	err = rows.Scan(&book.ID,
 		&book.Title,
 		&book.Description,
 		&book.Price,
@@ -123,10 +129,11 @@ func GetBook(bookSlug string) (models.Book, error) {
 		&book.UserImg,
 	)
 
+	fmt.Println("ERR", err)
+
 	switch err {
 	case sql.ErrNoRows:
-		fmt.Println("No rows were returned.")
-		return book, fmt.Errorf("book with slug of %v could not be found", bookSlug)
+		return book, fmt.Errorf("book with slug of %v or id of %v could not be found", bookSlug, bookId)
 	case nil:
 		return book, nil
 	default:

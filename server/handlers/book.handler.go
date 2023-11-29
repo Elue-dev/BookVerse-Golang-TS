@@ -102,8 +102,9 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 
 func GetSingleBook(w http.ResponseWriter, r *http.Request) {
 	bookSlug := mux.Vars(r)["slug"]
+	bookId := mux.Vars(r)["id"]
 
-	currBook, err := controllers.GetBook(bookSlug)
+	currBook, err := controllers.GetBook(bookSlug, bookId)
 
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
@@ -123,7 +124,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currBook, err := controllers.GetBook(bookId)
+	currBook, err := controllers.GetBook(bookId, "")
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
 		return
@@ -209,7 +210,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currBook, err := controllers.GetBook(bookId)
+	currBook, err := controllers.GetBook("", bookId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
 		return
