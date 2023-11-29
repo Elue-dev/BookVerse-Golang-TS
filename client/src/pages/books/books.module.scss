@@ -1,0 +1,74 @@
+@import "../../styles/mixins";
+@import "../../styles/colors";
+
+.books {
+  @include container();
+  padding-top: 2rem;
+  h2 {
+    padding-bottom: 0.3rem;
+  }
+
+  .all__books {
+    @include grid(repeat(3, 1fr), 3rem);
+    @include mQ(900px) {
+      @include grid(repeat(2, 1fr), 2rem);
+    }
+    @include mQ(600px) {
+      @include grid(1fr, 1rem);
+    }
+    .books__card {
+      border-radius: 0.3rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-top: 1rem;
+      overflow: hidden;
+      img {
+        border: 0.5px solid #c8c8c8;
+        height: 250px;
+        object-fit: cover;
+        overflow: hidden;
+        width: 100%;
+        border-left: 2px solid gray;
+        border-bottom: 0.5px solid $mainColor;
+      }
+      .book__details {
+        padding: 1rem;
+        @include flexBox(left, left, column);
+        border-right: 4px solid $mainColor;
+        gap: 0.3rem;
+        :nth-child(2) {
+          font-weight: 500;
+          @include flexBox(left, center);
+          gap: 0.5rem;
+
+          :first-child {
+            color: gray;
+          }
+        }
+        :nth-child(3) {
+          font-weight: 300;
+          color: rgb(108, 108, 108);
+        }
+        .bottom {
+          @include flexBox(space-between, center);
+          :nth-child(2) {
+            font-weight: 500;
+            font-size: 1.3rem;
+          }
+          button {
+            outline: 0;
+            border: 0;
+            margin-top: 1rem;
+            background: transparent;
+            border: 3px solid #746ab0;
+            color: $mainColor;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            padding: 0.4rem 1.4rem;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+}

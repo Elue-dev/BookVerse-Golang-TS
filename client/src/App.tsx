@@ -7,6 +7,7 @@ import BookDetail from "./pages/book_detail/BookDetail";
 
 const Home = lazy(() => import("./pages/home/Home"));
 const Auth = lazy(() => import("./pages/auth/Auth"));
+const Books = lazy(() => import("./pages/books/Books"));
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
                 }
               />
               <Route path="/book/:slug" element={<BookDetail />} />
+              <Route path="/books" element={<Books />} />
               {/* <Route
                 path="/auth"
                 element={
@@ -44,7 +46,6 @@ function App() {
                   </Unauthenticated>
                 }
               />
-              <Route path="/books" element={<Books />} />
 
               <Route path="/add-book" element={<AddBook />} />
 
