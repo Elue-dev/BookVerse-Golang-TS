@@ -57,5 +57,6 @@ func ConsumeFromRabbitMQ() {
 	}()
 
 	log.Printf("Waiting for messages in queue...")
+
 	<-forever
 }

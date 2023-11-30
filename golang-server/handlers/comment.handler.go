@@ -86,7 +86,7 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if currBook.UserId != currUser.ID {
-		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only edit commennts you added", "comment user_id and user id do not match")
+		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only edit comments you added", "comment user_id and book user id do not match")
 		return
 	}
 
@@ -97,4 +97,34 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendSuccessResponse(w, http.StatusOK, "Comment updated successfully")
+}
+
+func DeleteComment(w http.ResponseWriter, r *http.Request) {
+	commentId := mux.Vars(r)["commentId"]
+	bookId := mux.Vars(r)["bookId"]
+
+	currBook, err := controllers.GetBook("", bookId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided book id not found", err.Error())
+		return
+	}
+
+	currUser, err := helpers.GetUserFromToken(r)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusUnauthorized, "You are not authorized", err.Error())
+		return
+	}
+
+	if currBook.UserId != currUser.ID {
+		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only delete comments you added", "comment user_id and book user id do not match")
+		return
+	}
+
+	_, err = controllers.RemoveComment(commentId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not delete comment", err.Error())
+		return
+	}
+
+	helpers.SendSuccessResponse(w, http.StatusOK, "Comment deleted successfully")
 }

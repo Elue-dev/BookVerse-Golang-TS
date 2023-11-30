@@ -102,3 +102,24 @@ func ModifyComment(commentId, message string) (int64, error) {
 
 	return rowsAffected, nil
 }
+
+func RemoveComment(commentId string) (int64, error) {
+
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery := "DELETE FROM comments WHERE id = $1"
+
+	res, err := db.Exec(sqlQuery, commentId)
+
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	return rowsAffected, nil
+}
