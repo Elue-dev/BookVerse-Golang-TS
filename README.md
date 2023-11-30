@@ -4,13 +4,19 @@
 
 ## Langauges
 
-- Frontend: TypeScript (React Framework)
-- Backend: Go (Go Lang)
+### Frontend
 
-## Database
+- TypeScript (React Framework)
+
+### Backend
+
+- Go (Go Lang)
+- Node.js
+
+### Database
 
 - PostgreSQL (No ORM)
 
-## HTTP Framework (Backend)
+### HTTP Framework (Backend)
 
 - Mux
