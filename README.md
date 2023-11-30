@@ -11,7 +11,7 @@
 ### Backend
 
 - **Go (Go Lang)**: Majority of the backend was written in Go. It basically handle everything on the backend from authentication to books to transactions etc. The only thing it did not handle is the Email service.
-- **Node.js**: This was used to handle the emailing for the applications such as welcome email, password reset email etc.
+- **Node.js**: This was used to handle the emailing for the application such as welcome email, password reset email etc.
 
 ### Database
 
