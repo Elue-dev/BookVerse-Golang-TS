@@ -34,5 +34,9 @@ func Router() *mux.Router {
 	router.HandleFunc("/api/comments/{id}", middlewares.VerifyAuthStatus(handlers.UpdateComment)).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/api/comments/{commentId}/{bookId}", middlewares.VerifyAuthStatus(handlers.DeleteComment)).Methods("DELETE", "OPTIONS")
 
+	// TRANSACTION ROUTES
+	router.HandleFunc("/api/transactions", middlewares.VerifyAuthStatus(handlers.CreateTransaction)).Methods("POST", "OPTIONS")
+	router.HandleFunc("/api/transactions", middlewares.VerifyAuthStatus(handlers.GetUserTransactions)).Methods("GET", "OPTIONS")
+
 	return router
 }

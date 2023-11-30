@@ -54,3 +54,12 @@ type Transaction struct {
 	TransactionId string `json:"transaction_id"`
 	CreatedAt     string `json:"created_at"`
 }
+
+type TransactionWithUserAndBookFields struct {
+	Transaction
+	BookTitle    string `json:"book_title"`
+	BookPrice    string `json:"book_price"`
+	BookImg      string `json:"book_img"`
+	BookSlug     string `json:"book_slug"`
+	BookCategory string `json:"book_category"`
+}

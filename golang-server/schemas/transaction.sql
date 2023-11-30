@@ -2,6 +2,6 @@ CREATE TABLE transactions (
     ID UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     UserId UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     BookId UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-    TransactionId UUID NOT NULL,
+    TransactionId TEXT NOT NULL,
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

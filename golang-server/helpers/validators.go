@@ -39,3 +39,11 @@ func ValidateCommentFields(message, bookId string) bool {
 		return true
 	}
 }
+
+func ValidateTransactionFields(bookId, transactionId string) bool {
+	if bookId == "" || transactionId == "" {
+		return false
+	} else {
+		return true
+	}
+}
