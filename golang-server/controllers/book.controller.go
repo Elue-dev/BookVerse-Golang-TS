@@ -122,7 +122,8 @@ func GetBook(bookSlug, bookId string) (models.Book, error) {
 
 	rows := db.QueryRow(sqlQuery, bookSlug, bookId)
 
-	err = rows.Scan(&book.ID,
+	err = rows.Scan(
+		&book.ID,
 		&book.Title,
 		&book.Description,
 		&book.Price,

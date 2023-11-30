@@ -44,6 +44,18 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 	helpers.SendSuccessResponse(w, http.StatusCreated, "Comment added successfully")
 }
 
+func GetSingleComment(w http.ResponseWriter, r *http.Request) {
+	commentId := mux.Vars(r)["id"]
+
+	result, err := controllers.GetComment(commentId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Could not get comment", err.Error())
+		return
+	}
+
+	helpers.SendSuccessResponseWithData(w, http.StatusOK, result)
+}
+
 func GetBookComments(w http.ResponseWriter, r *http.Request) {
 	bookId := mux.Vars(r)["bookId"]
 
@@ -103,11 +115,19 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 	commentId := mux.Vars(r)["commentId"]
 	bookId := mux.Vars(r)["bookId"]
 
+	_, err := controllers.GetComment(commentId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Commennt could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
+		return
+	}
+
 	currBook, err := controllers.GetBook("", bookId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided book id not found", err.Error())
 		return
 	}
+
+	fmt.Println("currBook", currBook)
 
 	currUser, err := helpers.GetUserFromToken(r)
 	if err != nil {

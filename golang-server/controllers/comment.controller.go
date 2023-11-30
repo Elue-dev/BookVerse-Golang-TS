@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/elue-dev/BookVerse-Golang-TS/connections"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 func AddComment(c models.Comment) (models.Comment, error) {
@@ -82,6 +86,51 @@ func GetCommentsForBook(bookId string) ([]models.CommentWithUserFields, error) {
 	return comments, nil
 }
 
+func GetComment(commentId string) (models.Comment, error) {
+	var comment models.Comment
+
+	if commentId == "" {
+		return comment, errors.New("comment id cannot be empty")
+	}
+
+	_, err := uuid.Parse(commentId)
+	if err != nil {
+		return comment, fmt.Errorf("comment id of %v does not match the expected format", commentId)
+	}
+
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery := "SELECT * FROM comments WHERE id = $1"
+
+	rows := db.QueryRow(sqlQuery, commentId)
+
+	err = rows.Scan(
+		&comment.ID,
+		&comment.Message,
+		&comment.UserId,
+		&comment.BookId,
+		&comment.CreatedAt,
+		&comment.UpdatedAt,
+	)
+
+	switch err {
+	case sql.ErrNoRows:
+		return comment, fmt.Errorf("comment with id of %v could not be found", commentId)
+	case nil:
+		return comment, nil
+	default:
+		fmt.Println("No rows were returned.")
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code == "22P02" {
+				return comment, fmt.Errorf("book with slug of %v could not be found", commentId)
+			}
+		}
+	}
+
+	return comment, nil
+}
+
 func ModifyComment(commentId, message string) (int64, error) {
 
 	db := connections.CeateConnection()
@@ -104,7 +153,6 @@ func ModifyComment(commentId, message string) (int64, error) {
 }
 
 func RemoveComment(commentId string) (int64, error) {
-
 	db := connections.CeateConnection()
 	defer db.Close()
 

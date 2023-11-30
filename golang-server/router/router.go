@@ -29,7 +29,8 @@ func Router() *mux.Router {
 
 	// COMMENT ROUTES
 	router.HandleFunc("/api/comments", middlewares.VerifyAuthStatus(handlers.CreateComment)).Methods("POST", "OPTIONS")
-	router.HandleFunc("/api/comments/book/{bookId}", middlewares.VerifyAuthStatus(handlers.GetBookComments)).Methods("GET", "OPTIONS")
+	router.HandleFunc("/api/comments/{id}", handlers.GetSingleComment).Methods("GET", "OPTIONS")
+	router.HandleFunc("/api/comments/book/{bookId}", handlers.GetBookComments).Methods("GET", "OPTIONS")
 	router.HandleFunc("/api/comments/{id}", middlewares.VerifyAuthStatus(handlers.UpdateComment)).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/api/comments/{commentId}/{bookId}", middlewares.VerifyAuthStatus(handlers.DeleteComment)).Methods("DELETE", "OPTIONS")
 
