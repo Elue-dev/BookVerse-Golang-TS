@@ -2,16 +2,15 @@ package rabbitmq
 
 import (
 	"log"
+	"os"
 
 	"github.com/streadway/amqp"
 )
 
-const (
-	rabbitMQURL = "amqp://guest:guest@localhost:5672/"
-	queueName   = "welcome_user_queue"
-)
-
 func ConsumeFromRabbitMQ() {
+	rabbitMQURL := os.Getenv("RABBIT_URL")
+	queueName := "welcome_user_queue"
+
 	conn, err := amqp.Dial(rabbitMQURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
@@ -25,25 +24,25 @@ func ConsumeFromRabbitMQ() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		queueName, // name
-		false,     // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
+		queueName,
+		false,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		log.Fatalf("Failed to declare a queue: %s", err)
 	}
 
 	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		q.Name,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		log.Fatalf("Failed to register a consumer: %s", err)

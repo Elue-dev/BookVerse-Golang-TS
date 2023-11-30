@@ -2,16 +2,15 @@ package rabbitmq
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/streadway/amqp"
 )
 
-const (
-	RabbitMQURL = "amqp://guest:guest@localhost:5672/"
-	QueueName   = "welcome_user_queue"
-)
-
 func SendToRabbitMQ(userEmail string, username string) error {
+	RabbitMQURL := os.Getenv("RABBIT_URL")
+	QueueName := "welcome_user_queue"
+
 	conn, err := amqp.Dial(RabbitMQURL)
 	if err != nil {
 		return err
@@ -25,12 +24,12 @@ func SendToRabbitMQ(userEmail string, username string) error {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		QueueName, // name
-		false,     // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
+		QueueName,
+		false,
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return err
@@ -38,10 +37,10 @@ func SendToRabbitMQ(userEmail string, username string) error {
 
 	message := fmt.Sprintf("%s,%s", userEmail, username)
 	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
+		"",
+		q.Name,
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(message),
