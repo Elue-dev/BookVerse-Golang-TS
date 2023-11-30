@@ -85,6 +85,12 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = controllers.GetComment(commentId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Commennt could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
+		return
+	}
+
 	currBook, err := controllers.GetBook("", comment.BookId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided book id not found", err.Error())
