@@ -20,3 +20,7 @@
 ### HTTP Framework (Backend)
 
 - Mux
+
+### Message Queue
+
+- Rabbit MQ: This was used for communication between the two servers, using the AMQP Protocol.
