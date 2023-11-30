@@ -46,3 +46,11 @@ type CommentWithUserFields struct {
 	Username string `json:"username"`
 	UserImg  string `json:"user_img"`
 }
+
+type Transaction struct {
+	ID            string `json:"id"`
+	UserId        string `json:"user_id"`
+	BookId        string `json:"book_id"`
+	TransactionId string `json:"transaction_id"`
+	CreatedAt     string `json:"created_at"`
+}
