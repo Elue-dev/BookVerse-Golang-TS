@@ -8,6 +8,7 @@ import (
 
 	"github.com/elue-dev/BookVerse-Golang-TS/connections"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	rabbitmq "github.com/elue-dev/BookVerse-Golang-TS/rabbitMQ"
 )
 
 func RegisterUser(u models.User) (models.User, error) {
@@ -28,7 +29,8 @@ func RegisterUser(u models.User) (models.User, error) {
 		u.Username,
 		u.Email,
 		u.Password,
-		u.Avatar).Scan(&user.ID,
+		u.Avatar).Scan(
+		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.Password,
@@ -39,6 +41,11 @@ func RegisterUser(u models.User) (models.User, error) {
 	if err != nil {
 		fmt.Printf("Failed to execute insert query: %v", err)
 		return user, errors.New(err.Error())
+	}
+
+	err = rabbitmq.SendToRabbitMQ(user.Email, user.Username)
+	if err != nil {
+		return user, errors.New("rabbit MQ error: could not send message to queue")
 	}
 
 	return user, nil

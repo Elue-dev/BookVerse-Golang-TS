@@ -4,13 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"sync"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	rabbitmq "github.com/elue-dev/BookVerse-Golang-TS/rabbitMQ"
 )
+
+var wg sync.WaitGroup
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	var user models.User
@@ -73,6 +77,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendSuccessResponseWithData(w, http.StatusCreated, result)
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		rabbitmq.ConsumeFromRabbitMQ()
+	}()
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -97,6 +108,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
 			return
 		}
+
 		helpers.SendLoginSuccessResponse(w, http.StatusOK, currUser, token)
 	} else {
 		helpers.SendErrorResponse(w, http.StatusBadRequest, "Invalid credentials provided", nil)

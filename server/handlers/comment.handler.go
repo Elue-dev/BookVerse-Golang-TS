@@ -68,7 +68,6 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 	var comment models.Comment
 
 	err := json.NewDecoder(r.Body).Decode(&comment)
-	fmt.Println("comment", comment)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusBadRequest, "Comment message is required", err.Error())
 		return
