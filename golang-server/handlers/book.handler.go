@@ -124,7 +124,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currBook, err := controllers.GetBook(bookId, "")
+	currBook, err := controllers.GetBook("", bookId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not get book", err.Error())
 		return

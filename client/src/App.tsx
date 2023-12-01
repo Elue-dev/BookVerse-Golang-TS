@@ -4,12 +4,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import BookDetail from "./pages/book_detail/BookDetail";
 import Authenticated from "./components/protect_routes/authenticated";
-// import Unauthenticated from "./components/protect_routes/unauthenticated";
+import Navlinks from "./components/nav_links/Navlinks";
+import ScrollToTop from "./utils/scrollToTop";
+import Unauthenticated from "./components/protect_routes/unauthenticated";
+import Footer from "./components/footer/Footer";
+import { BiBookReader } from "react-icons/bi";
 
 const Home = lazy(() => import("./pages/home/Home"));
 const Auth = lazy(() => import("./pages/auth/Auth"));
 const Books = lazy(() => import("./pages/books/Books"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
+const AddBook = lazy(() => import("./pages/add_book/AddBook"));
 
 function App() {
   return (
@@ -17,13 +22,15 @@ function App() {
       <Toaster />
       <BrowserRouter>
         <Header />
-        {/* <Navlinks /> */}
-        {/* <ScrollToTop /> */}
+        <Navlinks />
+        <ScrollToTop />
         <div className="main">
           <Suspense
             fallback={
               <div className="loading suspense">
-                <div>{/* <BiBookReader />{" "} */}</div>
+                <div>
+                  <BiBookReader />
+                </div>
                 <h2>BOOKVERSE...</h2>
               </div>
             }
@@ -33,9 +40,9 @@ function App() {
               <Route
                 path="/auth"
                 element={
-                  // <Unauthenticated>
-                  <Auth />
-                  // </Unauthenticated>
+                  <Unauthenticated>
+                    <Auth />
+                  </Unauthenticated>
                 }
               />
               <Route path="/book/:slug/:bookId" element={<BookDetail />} />
@@ -48,6 +55,7 @@ function App() {
                   </Authenticated>
                 }
               />
+              <Route path="/add-book" element={<AddBook />} />
               {/* <Route
                 path="/auth"
                 element={
@@ -57,14 +65,13 @@ function App() {
                 }
               />
 
-              <Route path="/add-book" element={<AddBook />} />
 
               <Route path="*" element={<ErrorPage />} /> */}
             </Routes>
           </Suspense>
         </div>
 
-        {/* <Footer /> */}
+        <Footer />
       </BrowserRouter>
     </div>
   );
