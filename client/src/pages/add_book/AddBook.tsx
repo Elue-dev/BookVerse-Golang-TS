@@ -120,7 +120,9 @@ export default function AddBook() {
 
   const addBookMutation = useMutation<Book, Error, FormData, unknown>({
     mutationFn,
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      console.log({ data });
+
       toast.dismiss();
       successToast("Book added successfully");
       queryClient.invalidateQueries({

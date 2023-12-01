@@ -27,7 +27,7 @@ import { errorToast, successToast } from "../../utils/alerts";
 import { httpRequest } from "../../services/httpRequest";
 import { RootState } from "../../redux/store";
 import { User } from "../../types/user";
-// import { formatDate } from "../../helpers";
+
 import moment from "moment";
 
 export default function Comments({ bookId }: { bookId: string | undefined }) {
@@ -167,8 +167,11 @@ export default function Comments({ bookId }: { bookId: string | undefined }) {
             )}
           </div>
           <div className={styles["book__comments"]}>
-            {comments?.length === 0 ? (
-              <p>Be the first to add a comment</p>
+            {comments?.length === 0 || comments == null ? (
+              <>
+                <h3>No comments yet</h3>
+                <p>Be the first to add a comment to this book</p>
+              </>
             ) : (
               <>
                 {comments?.map((comment: Comment) => (

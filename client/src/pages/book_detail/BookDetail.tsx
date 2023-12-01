@@ -291,7 +291,7 @@ export default function BookDetail() {
           </p>
         ) : (
           similarBooks?.map((sb: Book) => (
-            <Link key={sb.id} to={`/book/${sb.slug}`}>
+            <Link key={sb.id} to={`/book/${sb.slug}/${sb.id}`}>
               <div className={styles.similar}>
                 <img
                   src={sb.image}
@@ -300,7 +300,7 @@ export default function BookDetail() {
                 />
                 <h3>{sb.title}</h3>
                 <p>
-                  <b>Genre:</b> {sb.category}
+                  <b style={{ color: "dddddd" }}>Genre:</b> {sb.category}
                 </p>
                 <p>
                   <b>Price:</b> ₦{new Intl.NumberFormat().format(sb.price)}

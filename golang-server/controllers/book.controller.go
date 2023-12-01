@@ -21,7 +21,7 @@ func CreateBook(b models.Book) (models.Book, error) {
 	sqlQuery := `
 		INSERT INTO books 
 		(title, description, price, image, userid, slug, category) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
+		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
 	 `
 
 	slug := utils.Slugify(b.Title)
