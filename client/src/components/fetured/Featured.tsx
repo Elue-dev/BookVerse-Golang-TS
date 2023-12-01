@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import moment from "moment";
 import styles from "./featured.module.scss";
 import { Link } from "react-router-dom";
 import { BsFillCalendar2PlusFill } from "react-icons/bs";
@@ -65,8 +64,8 @@ export default function Featured() {
                 <div className={styles["book__details"]}>
                   <h3>{book.title}</h3>
                   <p>
-                    <BsFillCalendar2PlusFill />{" "}
-                    {moment(book.created_at).fromNow()}
+                    <BsFillCalendar2PlusFill />
+                    {new Date(book.created_at).toDateString()}
                   </p>
                   <p>{book.description.substring(0, 90)}...</p>
                   <div className={styles.bottom}>

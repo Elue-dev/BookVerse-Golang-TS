@@ -67,19 +67,26 @@ func GetCommentsForBook(bookId string) ([]models.CommentWithUserFields, error) {
 
 	for rows.Next() {
 		var comment models.CommentWithUserFields
+		var createdAt pq.NullTime
 		err = rows.Scan(
 			&comment.ID,
 			&comment.Message,
 			&comment.UserId,
 			&comment.BookId,
-			&comment.CreatedAt,
+			&createdAt,
 			&comment.UpdatedAt,
 			&comment.Username,
 			&comment.UserImg,
 		)
+
 		if err != nil {
 			return comments, err
 		}
+
+		if createdAt.Valid {
+			comment.CreatedAt = createdAt.Time.Format("2006-01-02T15:04:05Z07:00")
+		}
+
 		comments = append(comments, comment)
 	}
 
@@ -105,12 +112,14 @@ func GetComment(commentId string) (models.Comment, error) {
 
 	rows := db.QueryRow(sqlQuery, commentId)
 
+	var createdAt pq.NullTime
+
 	err = rows.Scan(
 		&comment.ID,
 		&comment.Message,
 		&comment.UserId,
 		&comment.BookId,
-		&comment.CreatedAt,
+		&createdAt,
 		&comment.UpdatedAt,
 	)
 
@@ -126,6 +135,10 @@ func GetComment(commentId string) (models.Comment, error) {
 				return comment, fmt.Errorf("book with slug of %v could not be found", commentId)
 			}
 		}
+	}
+
+	if createdAt.Valid {
+		comment.CreatedAt = createdAt.Time.Format("2006-01-02T15:04:05Z07:00")
 	}
 
 	return comment, nil

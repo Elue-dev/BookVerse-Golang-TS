@@ -39,3 +39,39 @@ func GetUser(userId string) (models.User, error) {
 
 	return user, nil
 }
+
+func ModifyUser(u models.User) (models.User, error) {
+	fmt.Println("user", u)
+
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	var user models.User
+
+	sqlQuery := "UPDATE users SET username = $2, password = $3, avatar = $4 WHERE id = $1 RETURNING *"
+
+	rows := db.QueryRow(
+		sqlQuery,
+		u.ID,
+		u.Username,
+		u.Password,
+		u.Avatar,
+	)
+
+	err := rows.Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.Avatar,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		return user, errors.New(err.Error())
+	}
+
+	return user, nil
+
+}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/elue-dev/BookVerse-Golang-TS/connections"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
+	"github.com/lib/pq"
 )
 
 func AddTransaction(t models.Transaction) (models.Transaction, error) {
@@ -60,21 +61,29 @@ func GetTransactionsByUser(userId string) ([]models.TransactionWithUserAndBookFi
 
 	for rows.Next() {
 		var transaction models.TransactionWithUserAndBookFields
+		var createdAt pq.NullTime
+
 		err = rows.Scan(
 			&transaction.ID,
 			&transaction.UserId,
 			&transaction.BookId,
 			&transaction.TransactionId,
-			&transaction.CreatedAt,
+			&createdAt,
 			&transaction.BookTitle,
 			&transaction.BookPrice,
 			&transaction.BookImg,
 			&transaction.BookSlug,
 			&transaction.BookCategory,
 		)
+
 		if err != nil {
 			return transactions, err
 		}
+
+		if createdAt.Valid {
+			transaction.CreatedAt = createdAt.Time.Format("2006-01-02T15:04:05Z07:00")
+		}
+
 		transactions = append(transactions, transaction)
 	}
 

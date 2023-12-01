@@ -71,7 +71,7 @@ export default function AddBook() {
       default:
         "";
     }
-  }, [action]);
+  }, [action, state]);
 
   type BookFields = {
     title: string;

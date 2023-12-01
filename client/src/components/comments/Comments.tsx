@@ -27,7 +27,8 @@ import { errorToast, successToast } from "../../utils/alerts";
 import { httpRequest } from "../../services/httpRequest";
 import { RootState } from "../../redux/store";
 import { User } from "../../types/user";
-import { formatDate } from "../../helpers";
+// import { formatDate } from "../../helpers";
+import moment from "moment";
 
 export default function Comments({ bookId }: { bookId: string | undefined }) {
   const currentUser: User | null = useSelector<RootState, User | null>(
@@ -181,7 +182,7 @@ export default function Comments({ bookId }: { bookId: string | undefined }) {
                     </div>
                     <div className={styles.date}>
                       <CiClock2 />
-                      {formatDate(comment.created_at)}
+                      {moment(comment.created_at).fromNow()}
                     </div>
                     {comment.user_id === currentUser?.id && (
                       <div>

@@ -7,7 +7,6 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
 import { useSelector } from "react-redux";
-import moment from "moment";
 import {
   getCurrentUser,
   getUserToken,
@@ -228,9 +227,15 @@ export default function BookDetail() {
           <div className={styles.user}>
             <b>{book?.username}</b>
             {currentUser?.id === book?.userId ? (
-              <p>Added by you {moment(book?.created_at).fromNow()}</p>
+              <p>
+                Added by you on{" "}
+                {new Date(book?.created_at || Date.now()).toDateString()}
+              </p>
             ) : (
-              <p>Added {moment(book?.created_at).fromNow()}</p>
+              <p>
+                Added on{" "}
+                {new Date(book?.created_at || Date.now()).toDateString()}
+              </p>
             )}
           </div>
 
