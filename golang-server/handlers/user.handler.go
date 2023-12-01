@@ -29,9 +29,20 @@ func GetSingleUser(w http.ResponseWriter, r *http.Request) {
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 
+	username := r.FormValue("username")
+	providedPassword := r.FormValue("password")
+	oldPassword := r.FormValue("old_password")
+
+	emptyBodyError := "Please provide at least one user information to update"
+
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide at least one user information to update", err.Error())
+		helpers.SendErrorResponse(w, http.StatusBadRequest, emptyBodyError, err.Error())
+		return
+	}
+
+	if username == "" && providedPassword == "" && oldPassword == "" {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, emptyBodyError, emptyBodyError)
 		return
 	}
 
@@ -41,18 +52,24 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.FormValue("username")
-	providedPassword := r.FormValue("password")
-	oldPassword := r.FormValue("old_password")
+	if providedPassword != "" {
+		if providedPassword == oldPassword {
+			helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provided a different password from your old password", "new password should be different from old password")
+			return
+		}
+
+	}
 
 	if providedPassword != "" && oldPassword == "" {
 		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide your old password to change to a new one", "old_password not found in request body")
 		return
 	}
 
-	if passwordIsValid := helpers.ComparePasswordWithHash(currUser.Password, oldPassword); !passwordIsValid {
-		helpers.SendErrorResponse(w, http.StatusBadRequest, "Old Password is incorrect", "old password incorrect")
-		return
+	if providedPassword != "" {
+		if passwordIsValid := helpers.ComparePasswordWithHash(currUser.Password, oldPassword); !passwordIsValid {
+			helpers.SendErrorResponse(w, http.StatusBadRequest, "Old Password is incorrect", "old password incorrect")
+			return
+		}
 	}
 
 	user.ID = currUser.ID

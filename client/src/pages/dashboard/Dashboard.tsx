@@ -18,6 +18,7 @@ import { CiLogout } from "react-icons/ci";
 import { User } from "../../types/user";
 import { RootState } from "../../redux/store";
 import UserBooks from "./user_books/Userbooks";
+import { toast } from "react-hot-toast";
 
 export default function Dashboard() {
   const currentUser: User | null = useSelector<RootState, User | null>(
@@ -70,34 +71,37 @@ export default function Dashboard() {
       return errorToast("New password credentials do not match");
 
     setLoading(true);
+    toast.loading("Updating profile...");
     try {
       const formData = new FormData();
       formData.append("username", credentials.username || "");
       formData.append("password", newPassword);
+      formData.append("old_password", credentials.oldPassword);
       if (image) {
         formData.append("image", image);
       } else {
         formData.append("image", "");
       }
 
-      const response = await httpRequest.patch(
-        `${SERVER_URL}/users/${currentUser?.id}`,
+      const response = await httpRequest.put(
+        `${SERVER_URL}/api/users/${currentUser?.id}`,
         formData,
         authHeaders
       );
 
       if (response) {
+        toast.dismiss();
         setLoading(false);
-        dispatch(SET_ACTIVE_USER(response.data.user));
+        dispatch(SET_ACTIVE_USER(response.data.data));
 
         if (newPassword) {
           successToast(
-            `${response.data.message}. You changed your password, Please log in again`
+            "Account updated successfully. You changed your password, Please log in again"
           );
           dispatch(REMOVE_ACTIVE_USER());
           navigate("/auth");
         } else {
-          successToast(response.data.message);
+          successToast("Account has been updated successfully");
         }
       }
     } catch (error: any) {

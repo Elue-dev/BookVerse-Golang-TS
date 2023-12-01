@@ -13,4 +13,4 @@ CREATE TABLE books (
 );
 
 ALTER TABLE books ADD COLUMN user_img TEXT NOT NULL DEFAULT 'https://res.cloudinary.com/dwdsjbetu/image/upload/v1694223269/djsplkr1hyxxtor7mogw.jpg';
-
+ALTER TABLE books DROP COLUMN user_img;

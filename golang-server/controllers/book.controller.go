@@ -20,7 +20,7 @@ func CreateBook(b models.Book) (models.Book, error) {
 
 	sqlQuery := `
 		INSERT INTO books 
-		(title, description, price, image, userid, slug, category, user_img) 
+		(title, description, price, image, userid, slug, category) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
 	 `
 
@@ -34,7 +34,6 @@ func CreateBook(b models.Book) (models.Book, error) {
 		b.UserId,
 		slug,
 		b.Category,
-		b.UserImg,
 	).
 		Scan(&book.ID,
 			&book.Title,
@@ -46,7 +45,6 @@ func CreateBook(b models.Book) (models.Book, error) {
 			&book.Category,
 			&book.CreatedAt,
 			&book.UpdatedAt,
-			&book.UserImg,
 		)
 
 	if err != nil {
@@ -68,7 +66,7 @@ func GetBooks() ([]models.BookWithUsername, error) {
 
 	var books []models.BookWithUsername
 
-	sqlQuery := "SELECT b.*, u.username FROM books b JOIN users u ON b.userid = u.id ORDER BY createdat DESC"
+	sqlQuery := "SELECT b.*, u.username FROM books b JOIN users u ON b.userid = u.id ORDER BY createdat desc"
 	rows, err := db.Query(sqlQuery)
 
 	if err != nil {
@@ -93,7 +91,6 @@ func GetBooks() ([]models.BookWithUsername, error) {
 			&book.Category,
 			&createdAt,
 			&updatedAt,
-			&book.UserImg,
 			&book.Username,
 		)
 		if err != nil {
@@ -114,22 +111,22 @@ func GetBooks() ([]models.BookWithUsername, error) {
 	return books, nil
 }
 
-func GetBook(bookSlug, bookId string) (models.Book, error) {
+func GetBook(bookSlug, bookId string) (models.BookWithUsernameAndAvatar, error) {
+	var book models.BookWithUsernameAndAvatar
+
 	if bookId == "" {
-		return models.Book{}, errors.New("book id cannot be empty")
+		return book, errors.New("book id cannot be empty")
 	}
 
 	_, err := uuid.Parse(bookId)
 	if err != nil {
-		return models.Book{}, fmt.Errorf("book id of %v does not match the expected format", bookId)
+		return book, fmt.Errorf("book id of %v does not match the expected format", bookId)
 	}
 
 	db := connections.CeateConnection()
 	defer db.Close()
 
-	var book models.Book
-
-	sqlQuery := "SELECT * FROM books WHERE slug = $1 OR id = $2"
+	sqlQuery := "SELECT b.*, u.username, u.avatar FROM books b JOIN users u ON b.userid = u.id WHERE b.slug = $1 OR b.id = $2"
 
 	rows := db.QueryRow(sqlQuery, bookSlug, bookId)
 
@@ -147,10 +144,9 @@ func GetBook(bookSlug, bookId string) (models.Book, error) {
 		&book.Category,
 		&createdAt,
 		&updatedAt,
-		&book.UserImg,
+		&book.Username,
+		&book.UserAvatar,
 	)
-
-	fmt.Println("ERR", err)
 
 	switch err {
 	case sql.ErrNoRows:
@@ -257,7 +253,6 @@ func GetUserBooks(userId string) ([]models.Book, error) {
 			&createdAt,
 			&updatedAt,
 			&book.UpdatedAt,
-			&book.UserImg,
 		)
 		if err != nil {
 			return books, err

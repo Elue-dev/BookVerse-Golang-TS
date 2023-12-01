@@ -63,6 +63,8 @@ export default function BookDetail() {
     queryFn: queryFnCat,
   });
 
+  console.log({ book });
+
   //   const { data: transactions, isLoading: tLoading } = useQuery(
   //     [`transactions-${currentUser?.id}`],
   //     () =>
@@ -220,7 +222,7 @@ export default function BookDetail() {
 
         <div className={styles["added__by"]}>
           <img
-            src={book?.user_img}
+            src={book?.user_avatar}
             alt={book?.username}
             className={styles["user__img"]}
           />

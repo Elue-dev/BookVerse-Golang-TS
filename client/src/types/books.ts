@@ -9,6 +9,6 @@ export type Book = {
   category: string;
   created_at: string;
   updated_at: string;
-  user_img: string;
+  user_avatar: string;
   username: string;
 };
