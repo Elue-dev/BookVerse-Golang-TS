@@ -43,6 +43,17 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	username := r.FormValue("username")
 	providedPassword := r.FormValue("password")
+	oldPassword := r.FormValue("old_password")
+
+	if providedPassword != "" && oldPassword == "" {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide your old password to change to a new one", "old_password not found in request body")
+		return
+	}
+
+	if passwordIsValid := helpers.ComparePasswordWithHash(currUser.Password, oldPassword); !passwordIsValid {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "Old Password is incorrect", "old password incorrect")
+		return
+	}
 
 	user.ID = currUser.ID
 	user.Username = utils.UpdateFieldBasedOfValuePresence(username, currUser.Username).(string)
@@ -55,8 +66,8 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 			helpers.SendErrorResponse(w, http.StatusBadRequest, "Something went wrong in hashing password", err.Error())
 			return
 		}
-		user.Password = hashedPassword
 
+		user.Password = hashedPassword
 	}
 
 	file, _, err := r.FormFile("image")

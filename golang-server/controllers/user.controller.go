@@ -40,15 +40,19 @@ func GetUser(userId string) (models.User, error) {
 	return user, nil
 }
 
-func ModifyUser(u models.User) (models.User, error) {
-	fmt.Println("user", u)
-
+func ModifyUser(u models.User) (models.UserResponse, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
-	var user models.User
+	var user models.UserResponse
 
-	sqlQuery := "UPDATE users SET username = $2, password = $3, avatar = $4 WHERE id = $1 RETURNING *"
+	sqlQuery := `UPDATE users 
+		SET username = $2,
+		password = $3,
+		avatar = $4 
+		WHERE id = $1
+	    RETURNING id, username, email, avatar, createdat, updatedat
+	   `
 
 	rows := db.QueryRow(
 		sqlQuery,
@@ -62,7 +66,6 @@ func ModifyUser(u models.User) (models.User, error) {
 		&user.ID,
 		&user.Username,
 		&user.Email,
-		&user.Password,
 		&user.Avatar,
 		&user.CreatedAt,
 		&user.UpdatedAt,
@@ -73,5 +76,4 @@ func ModifyUser(u models.User) (models.User, error) {
 	}
 
 	return user, nil
-
 }

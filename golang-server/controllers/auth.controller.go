@@ -11,7 +11,7 @@ import (
 	rabbitmq "github.com/elue-dev/BookVerse-Golang-TS/rabbitMQ"
 )
 
-func RegisterUser(u models.User) (models.User, error) {
+func RegisterUser(u models.User) (models.UserResponse, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
@@ -23,7 +23,7 @@ func RegisterUser(u models.User) (models.User, error) {
 	 	RETURNING *
 		 `
 
-	var user models.User
+	var user models.UserResponse
 
 	err := db.QueryRow(sqlQuery,
 		u.Username,
@@ -36,7 +36,8 @@ func RegisterUser(u models.User) (models.User, error) {
 		&user.Password,
 		&user.Avatar,
 		&user.CreatedAt,
-		&user.UpdatedAt)
+		&user.UpdatedAt,
+	)
 
 	if err != nil {
 		fmt.Printf("Failed to execute insert query: %v", err)
@@ -51,7 +52,7 @@ func RegisterUser(u models.User) (models.User, error) {
 	return user, nil
 }
 
-func LoginUser(p models.LoginPayload) (models.User, error) {
+func LoginUser(p models.LoginPayload) (models.UserResponse, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
@@ -61,7 +62,7 @@ func LoginUser(p models.LoginPayload) (models.User, error) {
 		OR lower(username) = $2
 		 `
 
-	var user models.User
+	var user models.UserResponse
 
 	rows := db.QueryRow(sqlQuery,
 		strings.ToLower(p.EmailOrUsername),

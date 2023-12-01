@@ -10,7 +10,7 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import { MdOutlineArrowDropUp } from "react-icons/md";
 import styles from "./dashboard.module.scss";
 import { httpRequest } from "../../services/httpRequest";
-import { CLOUD_NAME, SERVER_URL, UPLOAD_PRESET } from "../../utils/variables";
+import { SERVER_URL } from "../../utils/variables";
 import { errorToast, successToast } from "../../utils/alerts";
 import { PulseLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
@@ -39,7 +39,6 @@ export default function Dashboard() {
   const imageRef = useRef<any>();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let imageUrl: string;
   const authHeaders = { headers: { authorization: `Bearer ${token}` } };
 
   const { username, oldPassword, newPassword, confirmPassword } = credentials;
@@ -53,26 +52,6 @@ export default function Dashboard() {
     const file = e.target.files?.[0];
     file && setImage(file);
     file && setImagePreview(URL.createObjectURL(file));
-  };
-
-  const uploadUserImage = async () => {
-    const img = new FormData();
-    if (image) {
-      img.append("file", image);
-    } else {
-      img.append("file", "");
-    }
-    img.append("cloud_name", CLOUD_NAME);
-    img.append("upload_preset", UPLOAD_PRESET);
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      { method: "post", body: img }
-    );
-    const imageData = await response.json();
-    imageUrl = imageData?.url?.toString();
-    setImage(null);
-    setImagePreview(null);
   };
 
   const updateUserCredentials = async (e: FormEvent) => {
@@ -92,20 +71,18 @@ export default function Dashboard() {
 
     setLoading(true);
     try {
-      image && (await uploadUserImage());
-
-      const userDetails = {
-        username,
-        email: currentUser?.email,
-        password: newPassword,
-        oldPassword,
-        confirmPassword,
-        image: imageUrl || currentUser?.avatar,
-      };
+      const formData = new FormData();
+      formData.append("username", credentials.username || "");
+      formData.append("password", newPassword);
+      if (image) {
+        formData.append("image", image);
+      } else {
+        formData.append("image", "");
+      }
 
       const response = await httpRequest.patch(
         `${SERVER_URL}/users/${currentUser?.id}`,
-        userDetails,
+        formData,
         authHeaders
       );
 

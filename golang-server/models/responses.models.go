@@ -21,3 +21,13 @@ type LoginResponse struct {
 	Token   string      `json:"token"`
 	Data    interface{} `json:"data"`
 }
+
+type UserResponse struct {
+	ID        string `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Avatar    string `json:"avatar"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Password  string `json:"-"`
+}
