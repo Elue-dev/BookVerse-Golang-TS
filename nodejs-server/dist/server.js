@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const welcome_publisher_1 = require("./rabbitmq/welcome.publisher");
 const forgot_password_publisher_1 = require("./rabbitmq/forgot.password.publisher");
+console.log("Loading environment variables from .env file");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 9090;

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { consumeFromRabbitMQAndSendWelcomeEmail } from "./rabbitmq/welcome.publisher";
 import { consumeFromRabbitMQAndSendFPasswordEmail } from "./rabbitmq/forgot.password.publisher";
 
+console.log("Loading environment variables from .env file");
 dotenv.config();
 
 const app = express();

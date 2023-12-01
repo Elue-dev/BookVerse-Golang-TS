@@ -14,10 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.establishRabbitConnection = void 0;
 const amqplib_1 = __importDefault(require("amqplib"));
-const rabbitMQURL = process.env.RABBIT_URL;
 function establishRabbitConnection() {
     return __awaiter(this, void 0, void 0, function* () {
-        const connection = yield amqplib_1.default.connect(rabbitMQURL);
+        const connection = yield amqplib_1.default.connect(process.env.RABBIT_URL);
         const channel = yield connection.createChannel();
         return channel;
     });

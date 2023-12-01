@@ -8,8 +8,7 @@ CREATE TABLE books (
     Slug TEXT NOT NULL,
     Category TEXT NOT NULL,
     CreatedAt TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    User_Img TEXT NOT NULL
+    UpdatedAt TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE books ADD COLUMN user_img TEXT NOT NULL DEFAULT 'https://res.cloudinary.com/dwdsjbetu/image/upload/v1694223269/djsplkr1hyxxtor7mogw.jpg';
