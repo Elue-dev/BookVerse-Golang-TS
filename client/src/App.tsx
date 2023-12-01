@@ -3,11 +3,13 @@ import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import BookDetail from "./pages/book_detail/BookDetail";
+import Authenticated from "./components/protect_routes/authenticated";
 // import Unauthenticated from "./components/protect_routes/unauthenticated";
 
 const Home = lazy(() => import("./pages/home/Home"));
 const Auth = lazy(() => import("./pages/auth/Auth"));
 const Books = lazy(() => import("./pages/books/Books"));
+const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 
 function App() {
   return (
@@ -38,6 +40,14 @@ function App() {
               />
               <Route path="/book/:slug/:bookId" element={<BookDetail />} />
               <Route path="/books" element={<Books />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <Authenticated>
+                    <Dashboard />
+                  </Authenticated>
+                }
+              />
               {/* <Route
                 path="/auth"
                 element={
@@ -49,14 +59,6 @@ function App() {
 
               <Route path="/add-book" element={<AddBook />} />
 
-              <Route
-                path="/dashboard"
-                element={
-                  <Authenticated>
-                    <Dashboard />
-                  </Authenticated>
-                }
-              />
               <Route path="*" element={<ErrorPage />} /> */}
             </Routes>
           </Suspense>

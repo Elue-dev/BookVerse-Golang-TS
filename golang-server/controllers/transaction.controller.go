@@ -44,7 +44,7 @@ func GetTransactionsByUser(userId string) ([]models.TransactionWithUserAndBookFi
 	sqlQuery :=
 		`
 				SELECT t.*, 
-				b.title, b.slug, b.price, b.image, b.category
+				b.title, b.price, b.image, b.slug, b.category
 				FROM transactions t
 				JOIN books b
 				ON t.bookid = b.id 
@@ -79,5 +79,4 @@ func GetTransactionsByUser(userId string) ([]models.TransactionWithUserAndBookFi
 	}
 
 	return transactions, nil
-
 }

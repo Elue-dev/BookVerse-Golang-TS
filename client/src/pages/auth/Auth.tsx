@@ -55,11 +55,8 @@ export default function Auth() {
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setAvatar(file);
-    }
+    file && setAvatar(file);
     file && setAvatarPreview(URL.createObjectURL(file));
-    console.log(avatar);
   };
 
   const loginUser = async (e: FormEvent) => {
