@@ -56,27 +56,30 @@ export default function Featured() {
           <div className="loading">LOADING...</div>
         ) : (
           <>
-            {books?.slice(0, 3).map((book) => (
-              <div className={styles["books__card"]} key={book.id}>
-                <div>
-                  <img src={book.image} alt="" />
-                </div>
-                <div className={styles["book__details"]}>
-                  <h3>{book.title}</h3>
-                  <p>
-                    <BsFillCalendar2PlusFill />
-                    {new Date(book.created_at).toDateString()}
-                  </p>
-                  <p>{book.description.substring(0, 90)}...</p>
-                  <div className={styles.bottom}>
-                    <Link to={`/book/${book.slug}/${book.id}`}>
-                      <button>See Details</button>
-                    </Link>
-                    <p>₦{new Intl.NumberFormat().format(book.price)}</p>
+            {books?.length === 0 ||
+              (books == null && <h2>No books here yet.</h2>)}
+            {books != null &&
+              books?.slice(0, 3).map((book) => (
+                <div className={styles["books__card"]} key={book.id}>
+                  <div>
+                    <img src={book.image} alt="" />
+                  </div>
+                  <div className={styles["book__details"]}>
+                    <h3>{book.title}</h3>
+                    <p>
+                      <BsFillCalendar2PlusFill />
+                      {new Date(book.created_at).toDateString()}
+                    </p>
+                    <p>{book.description.substring(0, 90)}...</p>
+                    <div className={styles.bottom}>
+                      <Link to={`/book/${book.slug}/${book.id}`}>
+                        <button>See Details</button>
+                      </Link>
+                      <p>₦{new Intl.NumberFormat().format(book.price)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </>
         )}
       </section>

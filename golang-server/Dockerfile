@@ -7,8 +7,6 @@ COPY go.mod .
 
 COPY go.sum .
 
-COPY .env .
-
 RUN go mod download
 
 COPY . ./
@@ -21,8 +19,6 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/main .
-
-COPY --from=builder /app/.env .
 
 EXPOSE 8080
 

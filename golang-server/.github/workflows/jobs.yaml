@@ -1,0 +1,31 @@
+name: BookVerse CI/CD
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      RABBIT_URL: ${{ secrets.RABBIT_URL }}
+      CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      - name: Build and Run Docker
+        run: |
+          docker build -t bookverse .
+          docker run -p 8080:8080 bookverse

@@ -2,8 +2,6 @@
 
 - A books application
 
-## Langauges
-
 ### Frontend
 
 - TypeScript (React Framework)
@@ -20,7 +18,7 @@
 ### Backend Frameworks
 
 - **Mux**: (For easy routing in the Go server)
-- **Express**: (To manage our Node.js server)
+- **Express**: (To manage the Node.js server)
 
 ### Message Queue
 

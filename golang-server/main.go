@@ -12,9 +12,10 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
+	if _, exists := os.LookupEnv("RAILWAY_ENVIRONMENT"); !exists {
+		if err := godotenv.Load(); err != nil {
+			log.Fatal("error loading .env file:", err)
+		}
 	}
 
 	PORT := os.Getenv("PORT")
@@ -24,7 +25,7 @@ func main() {
 
 	r := router.Router()
 
-	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:5173", "https://bookverse.vercel.app"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:5173", "https://bookversev2.vercel.app"})
 
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
