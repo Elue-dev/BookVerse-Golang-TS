@@ -10,12 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      DB_URL: ${{ secrets.DB_URL }}
-      RABBIT_URL: ${{ secrets.RABBIT_URL }}
-      CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -25,7 +19,9 @@ jobs:
         with:
           go-version: 1.19
 
+      - name: Create .env file
+        run: echo "$SECRET_ENV_CONTENT" > .env
+
       - name: Build and Run Docker
         run: |
           docker build -t bookverse .
-          docker run -p 8080:8080 bookverse

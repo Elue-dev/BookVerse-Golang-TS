@@ -68,13 +68,15 @@ func LoginUser(p models.LoginPayload) (models.UserResponse, error) {
 		strings.ToLower(p.EmailOrUsername),
 		strings.ToLower(p.EmailOrUsername))
 
-	err := rows.Scan(&user.ID,
+	err := rows.Scan(
+		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.Password,
 		&user.Avatar,
 		&user.CreatedAt,
-		&user.UpdatedAt)
+		&user.UpdatedAt,
+	)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

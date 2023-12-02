@@ -14,7 +14,6 @@ import NotFound from "./pages/not_found/NotFound";
 import { httpRequest } from "./services/httpRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserToken, REMOVE_ACTIVE_USER } from "./redux/slices/auth.slice";
-
 const Home = lazy(() => import("./pages/home/Home"));
 const Auth = lazy(() => import("./pages/auth/Auth"));
 const Books = lazy(() => import("./pages/books/Books"));
@@ -25,6 +24,7 @@ function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector(getUserToken);
+
   const authHeaders = {
     headers: { authorization: `Bearer ${token}` },
   };
@@ -32,17 +32,7 @@ function App() {
   useEffect(() => {
     async function checkAuthStatus() {
       try {
-        const response = await httpRequest.post(
-          "/auth/checkAuthStatus",
-          "",
-          authHeaders
-        );
-        if (!response.data.success) {
-          console.log("hereee");
-
-          dispatch(REMOVE_ACTIVE_USER());
-          navigate("/auth");
-        }
+        await httpRequest.post("/auth/checkAuthStatus", null, authHeaders);
       } catch (error: any) {
         if (error.response.data.error_details === "token malformed") {
           dispatch(REMOVE_ACTIVE_USER());

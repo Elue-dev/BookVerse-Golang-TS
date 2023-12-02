@@ -133,19 +133,19 @@ export default function BookDetail() {
       const response = await httpRequest.post(
         "/transactions",
         {
-          bookId: book?.id,
-          transactionId: tId,
+          book_id: book?.id,
+          transaction_id: tId,
         },
         authHeaders
       );
-      if (response) {
+
+      if (response.status === 200) {
         successToast(
           "Transaction successful. You would hear from us and get your book soon!"
         );
       }
     } catch (error) {
       errorToast("Something went wrong. Please try again.");
-      // console.log(error);
     }
   };
 
