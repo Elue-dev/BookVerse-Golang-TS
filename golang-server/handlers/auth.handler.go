@@ -1,13 +1,10 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"sync"
 
-	"github.com/cloudinary/cloudinary-go/v2"
-	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
@@ -42,32 +39,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = hashedPassword
 
-	file, _, err := r.FormFile("avatar")
+	cloudURL, statusCode, err := helpers.UploadMediaToCloud(w, r, "avatar")
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Please provide an avatar", err.Error())
-		return
-	}
-	defer file.Close()
-
-	cld, err := cloudinary.New()
-	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary", err.Error())
+		helpers.SendErrorResponse(w, statusCode, "media upload error", err.Error())
 		return
 	}
 
-	var ctx = context.Background()
-
-	uploadResult, err := cld.Upload.Upload(
-		ctx,
-		file,
-		uploader.UploadParams{PublicID: "avatar"})
-
-	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar", err.Error())
-		return
-	}
-
-	user.Avatar = uploadResult.SecureURL
+	user.Avatar = cloudURL
 
 	result, err := controllers.RegisterUser(user)
 

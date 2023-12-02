@@ -1,12 +1,9 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
-	"github.com/cloudinary/cloudinary-go/v2"
-	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
@@ -62,32 +59,13 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, _, err := r.FormFile("image")
+	cloudURL, statusCode, err := helpers.UploadMediaToCloud(w, r, "image")
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide the book image", "book image was not provided in the request body")
+		helpers.SendErrorResponse(w, statusCode, "media upload error", err.Error())
 		return
 	}
 
-	defer file.Close()
-
-	cld, err := cloudinary.New()
-	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary", err.Error())
-		return
-	}
-
-	var ctx = context.Background()
-	uploadResult, err := cld.Upload.Upload(
-		ctx,
-		file,
-		uploader.UploadParams{PublicID: "book image"})
-
-	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar", err.Error())
-		return
-	}
-
-	book.Image = uploadResult.SecureURL
+	book.Image = cloudURL
 
 	newBook, err := controllers.CreateBook(book)
 
@@ -163,33 +141,15 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		book.Image = currBook.Image
 	} else {
 		if file != nil {
-			cld, err := cloudinary.New()
+			cloudURL, statusCode, err := helpers.UploadMediaToCloud(w, r, "image")
 			if err != nil {
-				helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary", err.Error())
+				helpers.SendErrorResponse(w, statusCode, "media upload error", err.Error())
 				return
 			}
 
-			var ctx = context.Background()
-			uploadResult, err := cld.Upload.Upload(
-				ctx,
-				file,
-				uploader.UploadParams{PublicID: "book image"})
-
-			if err != nil {
-				helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar", err.Error())
-				return
-			}
-
-			book.Image = uploadResult.SecureURL
+			book.Image = cloudURL
 		}
-
 	}
-
-	defer func() {
-		if file != nil {
-			file.Close()
-		}
-	}()
 
 	_, err = controllers.ModifyBook(currBook.ID, book)
 	if err != nil {
