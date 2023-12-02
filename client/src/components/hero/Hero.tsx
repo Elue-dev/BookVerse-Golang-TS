@@ -73,7 +73,7 @@ export default function Hero() {
               {searchResults?.map((book) => (
                 <Link
                   key={book.id}
-                  to={`/book/${book.slug}`}
+                  to={`/book/${book.slug}/${book.id}`}
                   onClick={clearFields}
                 >
                   <div className={styles["search__details"]}>

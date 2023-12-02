@@ -1,6 +1,6 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Header from "./components/header/Header";
 import BookDetail from "./pages/book_detail/BookDetail";
 import Authenticated from "./components/protect_routes/authenticated";
@@ -9,6 +9,11 @@ import ScrollToTop from "./utils/scrollToTop";
 import Unauthenticated from "./components/protect_routes/unauthenticated";
 import Footer from "./components/footer/Footer";
 import { BiBookReader } from "react-icons/bi";
+import ErrorBoundary from "./components/ErrorBoundary";
+import NotFound from "./pages/not_found/NotFound";
+import { httpRequest } from "./services/httpRequest";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserToken, REMOVE_ACTIVE_USER } from "./redux/slices/auth.slice";
 
 const Home = lazy(() => import("./pages/home/Home"));
 const Auth = lazy(() => import("./pages/auth/Auth"));
@@ -17,14 +22,48 @@ const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const AddBook = lazy(() => import("./pages/add_book/AddBook"));
 
 function App() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const token = useSelector(getUserToken);
+  const authHeaders = {
+    headers: { authorization: `Bearer ${token}` },
+  };
+
+  useEffect(() => {
+    async function checkAuthStatus() {
+      try {
+        const response = await httpRequest.post(
+          "/auth/checkAuthStatus",
+          "",
+          authHeaders
+        );
+        if (!response.data.success) {
+          console.log("hereee");
+
+          dispatch(REMOVE_ACTIVE_USER());
+          navigate("/auth");
+        }
+      } catch (error: any) {
+        if (error.response.data.error_details === "token malformed") {
+          dispatch(REMOVE_ACTIVE_USER());
+          navigate("/auth");
+        }
+      }
+    }
+
+    checkAuthStatus();
+  }, []);
+
   return (
     <div className="app">
       <Toaster />
-      <BrowserRouter>
-        <Header />
-        <Navlinks />
-        <ScrollToTop />
-        <div className="main">
+
+      <Header />
+      <Navlinks />
+      <ScrollToTop />
+
+      <div className="main">
+        <ErrorBoundary>
           <Suspense
             fallback={
               <div className="loading suspense">
@@ -56,23 +95,14 @@ function App() {
                 }
               />
               <Route path="/add-book" element={<AddBook />} />
-              {/* <Route
-                path="/auth"
-                element={
-                  <Unauthenticated>
-                    <Auth />
-                  </Unauthenticated>
-                }
-              />
 
-
-              <Route path="*" element={<ErrorPage />} /> */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-        </div>
+        </ErrorBoundary>
+      </div>
 
-        <Footer />
-      </BrowserRouter>
+      <Footer />
     </div>
   );
 }

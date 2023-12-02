@@ -4,18 +4,18 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getCurrentUser,
   getUserToken,
-  // SAVE_URL,
+  SAVE_URL,
 } from "../../redux/slices/auth.slice";
 import Notiflix from "notiflix";
 import styles from "./book.detail.module.scss";
-// import PaystackPop from "@paystack/inline-js";
-// import { useEffect, useState } from "react";
+import PaystackPop from "@paystack/inline-js";
+import { useEffect, useState } from "react";
 import { SyncLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import { httpRequest } from "../../services/httpRequest";
@@ -24,17 +24,19 @@ import { errorToast, successToast } from "../../utils/alerts";
 import { User } from "../../types/user";
 import { RootState } from "../../redux/store";
 import Comments from "../../components/comments/Comments";
+import { Transaction } from "../../types/transaction";
+import { InfinitySpin } from "react-loader-spinner";
+import PostContent from "../../components/FormatContent";
 
 export default function BookDetail() {
-  // const [isPurchased, setIsPurchased] = useState(false);
   const { slug, bookId } = useParams();
-
+  const [isPurchased, setIsPurchased] = useState(false);
   const currentUser: User | null = useSelector<RootState, User | null>(
     getCurrentUser
   );
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
-  // const { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const { pathname } = useLocation();
   const token = useSelector(getUserToken);
 
   const authHeaders = { headers: { authorization: `Bearer ${token}` } };
@@ -49,6 +51,11 @@ export default function BookDetail() {
     return response.data.data;
   };
 
+  const queryFnT = async (): Promise<Transaction[]> => {
+    const response = await httpRequest.get("/transactions", authHeaders);
+    return response.data.data;
+  };
+
   const {
     isLoading,
     error,
@@ -58,22 +65,18 @@ export default function BookDetail() {
     queryFn,
   });
 
+  const { isLoading: tLoading, data: transactions } = useQuery<
+    Transaction[],
+    Error
+  >({
+    queryKey: [`transactions-${currentUser?.id}`],
+    queryFn: queryFnT,
+  });
+
   const { data: books } = useQuery<Book[], Error>({
     queryKey: [`books-${book?.category}`],
     queryFn: queryFnCat,
   });
-
-  console.log({ book });
-
-  //   const { data: transactions, isLoading: tLoading } = useQuery(
-  //     [`transactions-${currentUser?.id}`],
-  //     () =>
-  //       httpRequest
-  //         .get(`/transactions/all?bookId=${book?.id}`, authHeaders)
-  //         .then((res) => {
-  //           return res.data;
-  //         })
-  //   );
 
   const queryClient = useQueryClient();
 
@@ -125,73 +128,73 @@ export default function BookDetail() {
     mutation.mutate();
   };
 
-  //   const saveTransaction = async (tId: string) => {
-  //     try {
-  //       const response = await httpRequest.post(
-  //         "/transactions",
-  //         {
-  //           bookId: book.id,
-  //           transactionId: tId,
-  //         },
-  //         authHeaders
-  //       );
-  //       if (response) {
-  //         successToast(
-  //           "Transaction successful. You would hear from us and get your book soon!"
-  //         );
-  //       }
-  //     } catch (error) {
-  //       errorToast("Something went wrong. Please try again.");
-  //       // console.log(error);
-  //     }
-  //   };
+  const saveTransaction = async (tId: string) => {
+    try {
+      const response = await httpRequest.post(
+        "/transactions",
+        {
+          bookId: book?.id,
+          transactionId: tId,
+        },
+        authHeaders
+      );
+      if (response) {
+        successToast(
+          "Transaction successful. You would hear from us and get your book soon!"
+        );
+      }
+    } catch (error) {
+      errorToast("Something went wrong. Please try again.");
+      // console.log(error);
+    }
+  };
 
-  //   const buyBook = () => {
-  //     if (!currentUser) {
-  //       errorToast("Please login to purchase book");
-  //       dispatch(SAVE_URL(pathname));
-  //       navigate("/auth");
-  //       return;
-  //     }
+  const buyBook = () => {
+    if (!currentUser) {
+      errorToast("Please login to purchase book");
+      dispatch(SAVE_URL(pathname));
+      navigate("/auth");
+      return;
+    }
 
-  //     const initiatePayment = () => {
-  //       try {
-  //         const paystack = new PaystackPop();
-  //         paystack.newTransaction({
-  //           key: import.meta.env.VITE_PAYSTACK_KEY,
-  //           amount: book.price * 100,
-  //           email: currentUser.email,
-  //           name: currentUser.username,
-  //           onSuccess() {
-  //             saveTransaction(paystack.id);
-  //             setIsPurchased(true);
-  //           },
-  //           onCancel() {
-  //             errorToast("Transaction Cancelled ⛔️");
-  //             // console.log("");
-  //           },
-  //         });
-  //       } catch (err) {
-  //         // console.log(err);
-  //         errorToast("failed transaction" + err);
-  //       }
-  //     };
-  //     initiatePayment();
-  //   };
+    const initiatePayment = () => {
+      try {
+        const paystack = new PaystackPop();
+        paystack.newTransaction({
+          key: import.meta.env.VITE_PAYSTACK_KEY,
+          amount: (book?.price ?? 0) * 100,
+          email: currentUser.email,
+          name: currentUser.username,
+          onSuccess() {
+            saveTransaction(paystack.id);
+            setIsPurchased(true);
+          },
+          onCancel() {
+            errorToast("Transaction Cancelled ⛔️");
+            // console.log("");
+          },
+        });
+      } catch (err) {
+        // console.log(err);
+        errorToast("failed transaction" + err);
+      }
+    };
+    initiatePayment();
+  };
 
-  //   const myTransactions = transactions?.filter(
-  //     (t) => t.slug === slug && t.user_id === currentUser?.id
-  //   )[0];
+  const myTransactions = transactions?.filter(
+    (t: Transaction) => t.book_slug === slug && t.user_id === currentUser?.id
+  )[0];
 
-  //   useEffect(() => {
-  //     let userIds: string[] = [];
-  //     transactions?.map((t) => userIds.push(t.user_id));
-  //     if (userIds.includes(currentUser?.id)) {
-  //       setIsPurchased(true);
-  //     } else {
-  //       setIsPurchased(false);
-  //     }
-  //   }, [transactions, myTransactions]);
+  useEffect(() => {
+    const userIds: string[] = [];
+    transactions?.map((t: Transaction) => userIds.push(t.user_id));
+    if (userIds.includes(currentUser?.id ?? "")) {
+      setIsPurchased(true);
+    } else {
+      setIsPurchased(false);
+    }
+  }, [transactions, myTransactions, currentUser]);
 
   if (isLoading)
     return (
@@ -265,18 +268,30 @@ export default function BookDetail() {
               : ""}
           </p>
           <br />
-          <p>{book?.description}</p>
 
-          {/* {myTransactions && isPurchased ? (
-            <p className={styles.pdate}>
-              You purchased this book on{" "}
-              {new Date(myTransactions?.transaction_date).toDateString()}
-            </p>
+          <article>
+            <PostContent content={book?.description} />
+          </article>
+
+          {tLoading ? (
+            <div className="loading">
+              <InfinitySpin width="200" color="#4fa94d" />
+              <h3>GETTING TRANSACTIONS...</h3>
+            </div>
           ) : (
-            <button className={styles["purchase__btn"]} onClick={buyBook}>
-              Buy Book
-            </button>
-          )} */}
+            <>
+              {myTransactions && isPurchased ? (
+                <p className={styles.pdate}>
+                  You purchased this book on{" "}
+                  {new Date(myTransactions?.created_at).toDateString()}
+                </p>
+              ) : (
+                <button className={styles["purchase__btn"]} onClick={buyBook}>
+                  Buy Book
+                </button>
+              )}
+            </>
+          )}
         </div>
 
         <div className={styles["comments__container"]}>

@@ -1,8 +1,17 @@
 @import "../../styles/mixins";
 @import "../../styles/colors";
 
+.retry {
+  color: #746ab0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .comments {
   padding-top: 1.4rem;
+  @include mQ(600px) {
+    padding-bottom: 4rem;
+  }
   .header {
     @include flexBox(left, center);
     gap: 0.3rem;
@@ -72,27 +81,51 @@
     margin: auto;
     @include mQ(600px) {
       width: 100%;
+      max-width: 100%;
     }
     .comment__details {
-      @include flexBox(left, center);
+      @include flexBox(space-between, center);
       gap: 0.6rem;
       padding: 1rem 0;
       border-bottom: 0.5px solid rgb(231, 231, 231);
       @include mQ(600px) {
+        padding: 1rem;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
+        justify-content: left;
+        align-items: start;
       }
       img {
         width: 45px;
         height: 45px;
         border-radius: 50%;
         object-fit: cover;
+        @include mQ(600px) {
+          width: 30px;
+          height: 30px;
+        }
       }
       .username {
+        @include mQ(600px) {
+          font-size: 0.8rem;
+        }
+      }
+      .msg {
         font-weight: 200;
         color: #444;
+        font-size: 1rem;
+        @include mQ(600px) {
+          font-size: 0.95rem;
+        }
+      }
+      .top_sec {
+        @include flexBox(flex-start, flex-start);
+        gap: 0.7rem;
+      }
+      .bottom_sec {
+        @include mQ(600px) {
+          @include flexBox(start, center);
+          gap: 1rem;
+        }
       }
       .date {
         margin-left: auto;
@@ -109,9 +142,17 @@
   .edit {
     color: rgb(118, 185, 159);
     cursor: pointer;
+    font-size: 1.9rem;
+    @include mQ(600px) {
+      font-size: 1.5rem;
+    }
   }
   .delete {
     color: rgba(255, 0, 123, 0.461);
     cursor: pointer;
+    font-size: 1.9rem;
+    @include mQ(600px) {
+      font-size: 1.5rem;
+    }
   }
 }

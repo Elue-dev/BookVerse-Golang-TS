@@ -80,10 +80,10 @@ export default function AddBook() {
     price: string;
   };
 
-  const parseText = (html: string | null) => {
-    const value = new DOMParser().parseFromString(html!, "text/html");
-    return value.body.textContent;
-  };
+  // const parseText = (html: string | null) => {
+  //   const value = new DOMParser().parseFromString(html!, "text/html");
+  //   return value.body.textContent;
+  // };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -185,12 +185,13 @@ export default function AddBook() {
 
     const formData = new FormData();
     formData.append("title", title);
-    const parsedDescription: string | null = parseText(description);
-    if (parsedDescription !== null) {
-      formData.append("description", parsedDescription);
-    } else {
-      formData.append("description", "");
-    }
+    formData.append("description", description);
+    // const parsedDescription: string | null = parseText(description);
+    // if (parsedDescription !== null) {
+    //   formData.append("description", parsedDescription);
+    // } else {
+    //   formData.append("description", "");
+    // }
     formData.append("price", price);
     formData.append("category", category);
     if (image) {
@@ -236,12 +237,13 @@ export default function AddBook() {
 
     const formData = new FormData();
     formData.append("title", title);
-    const parsedDescription: string | null = parseText(description);
-    if (parsedDescription !== null) {
-      formData.append("description", parsedDescription);
-    } else {
-      formData.append("description", "");
-    }
+    // const parsedDescription: string | null = parseText(description);
+    // if (parsedDescription !== null) {
+    //   formData.append("description", parsedDescription);
+    // } else {
+    //   formData.append("description", "");
+    // }
+    formData.append("description", description);
     formData.append("price", price);
     formData.append("category", category);
     if (image) {

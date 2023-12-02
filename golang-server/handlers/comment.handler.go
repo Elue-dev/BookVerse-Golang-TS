@@ -85,13 +85,18 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = controllers.GetComment(commentId)
+	currComment, err := controllers.GetComment(commentId)
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusNotFound, "Commennt could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Comment could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
 		return
 	}
 
-	currBook, err := controllers.GetBook("", comment.BookId)
+	if currComment.Message == comment.Message {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "New comment is same as old comment", "new comment and old comment should be different")
+		return
+	}
+
+	_, err = controllers.GetBook("", comment.BookId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided book id not found", err.Error())
 		return
@@ -103,8 +108,8 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if currBook.UserId != currUser.ID {
-		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only edit comments you added", "comment user_id and book user id do not match")
+	if currComment.UserId != currUser.ID {
+		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only edit comments you added", "comment user_id and request user id do not match")
 		return
 	}
 
@@ -123,17 +128,21 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 
 	_, err := controllers.GetComment(commentId)
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusNotFound, "Commennt could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Comment could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
 		return
 	}
 
-	currBook, err := controllers.GetBook("", bookId)
+	currComment, err := controllers.GetComment(commentId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Comment could not be found", fmt.Sprintf("comment with id of %v does not exist", commentId))
+		return
+	}
+
+	_, err = controllers.GetBook("", bookId)
 	if err != nil {
 		helpers.SendErrorResponse(w, http.StatusNotFound, "Book with the provided book id not found", err.Error())
 		return
 	}
-
-	fmt.Println("currBook", currBook)
 
 	currUser, err := helpers.GetUserFromToken(r)
 	if err != nil {
@@ -141,8 +150,8 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if currBook.UserId != currUser.ID {
-		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only delete comments you added", "comment user_id and book user id do not match")
+	if currComment.UserId != currUser.ID {
+		helpers.SendErrorResponse(w, http.StatusForbidden, "You can only delete comments you added", "comment user_id and request user id do not match")
 		return
 	}
 

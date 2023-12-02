@@ -9,6 +9,8 @@ import { useDispatch } from "react-redux";
 import { CLOSE_MODAL } from "../../redux/slices/modal.slice";
 import { httpRequest } from "../../services/httpRequest";
 import { Book } from "../../types/books";
+import { InfinitySpin } from "react-loader-spinner";
+import PostContent from "../FormatContent";
 
 export default function Featured() {
   const dispatch = useDispatch();
@@ -53,7 +55,12 @@ export default function Featured() {
       <h2>FEATURED BOOKS</h2>
       <section className={styles["featured__books"]}>
         {isLoading ? (
-          <div className="loading">LOADING...</div>
+          <>
+            <div className="loading">
+              <InfinitySpin width="200" color="#4fa94d" />
+              <h3>GETTING BOOKS...</h3>
+            </div>
+          </>
         ) : (
           <>
             {books?.length === 0 ||
@@ -70,7 +77,9 @@ export default function Featured() {
                       <BsFillCalendar2PlusFill />
                       {new Date(book.created_at).toDateString()}
                     </p>
-                    <p>{book.description.substring(0, 90)}...</p>
+                    <PostContent
+                      content={book.description.substring(0, 100) + "..."}
+                    />
                     <div className={styles.bottom}>
                       <Link to={`/book/${book.slug}/${book.id}`}>
                         <button>See Details</button>

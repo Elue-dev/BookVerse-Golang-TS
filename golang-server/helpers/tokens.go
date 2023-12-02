@@ -33,7 +33,7 @@ func GenerateToken(userID string) (string, error) {
 	return tokenString, nil
 }
 
-func getTokenFromHeaders(r *http.Request) (string, error) {
+func GetTokenFromHeaders(r *http.Request) (string, error) {
 	headers := r.Header.Get("Authorization")
 	if headers == "" {
 		return "", errors.New("no Authorization headers found")
@@ -54,7 +54,7 @@ func GetUserFromToken(r *http.Request) (models.User, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
-	tokenString, err := getTokenFromHeaders(r)
+	tokenString, err := GetTokenFromHeaders(r)
 	if err != nil {
 		return models.User{}, errors.New("you are not authorized. headers should follow the pattern: Authorization: Bearer token")
 	}
