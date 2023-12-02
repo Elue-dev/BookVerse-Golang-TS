@@ -1,4 +1,3 @@
-# Builder Stage
 FROM node:14 AS builder
 
 WORKDIR /app
