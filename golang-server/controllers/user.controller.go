@@ -9,28 +9,35 @@ import (
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
 )
 
-func GetUser(userId string) (models.User, error) {
+func GetUser(userId, userEmail string) (models.User, error) {
 	db := connections.CeateConnection()
 	defer db.Close()
 
 	var user models.User
 
-	sqlQuery := "SELECT * FROM users WHERE id = $1"
+	sqlQuery := "SELECT * FROM users WHERE id = $1 OR email = $2"
 
-	rows := db.QueryRow(sqlQuery, userId)
+	rows := db.QueryRow(sqlQuery, userId, userEmail)
 
-	err := rows.Scan(&user.ID,
+	err := rows.Scan(
+		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.Password,
 		&user.Avatar,
 		&user.CreatedAt,
-		&user.UpdatedAt)
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		fmt.Println("Error scanning rows:", err)
+		return user, err
+	}
 
 	switch err {
 	case sql.ErrNoRows:
 		fmt.Println("No rows were returned.")
-		return user, errors.New("user with id of " + userId + " could not be found")
+		return user, errors.New("no rows were returned")
 	case nil:
 		return user, nil
 	default:

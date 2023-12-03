@@ -1,15 +1,17 @@
 package rabbitmq
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
 	"github.com/streadway/amqp"
 )
 
-func ConsumeFromRabbitMQ() {
+func ConsumeFromRabbitMQ(queueName string, callback func(models.QueueMessage)) {
 	rabbitMQURL := os.Getenv("RABBIT_URL")
-	queueName := "welcome_user_queue"
 
 	conn, err := amqp.Dial(rabbitMQURL)
 	if err != nil {
@@ -53,6 +55,21 @@ func ConsumeFromRabbitMQ() {
 	go func() {
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
+
+			var queueMsg models.QueueMessage
+
+			err := json.Unmarshal(d.Body, &queueMsg)
+			if err != nil {
+				fmt.Println("error unmarshalling json", err)
+			}
+
+			_, err = json.Marshal(queueMsg)
+			if err != nil {
+				fmt.Println("error marshalling json", err)
+			}
+
+			callback(queueMsg)
+
 		}
 	}()
 

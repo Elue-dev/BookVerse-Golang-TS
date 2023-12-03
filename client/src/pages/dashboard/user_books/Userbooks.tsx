@@ -114,7 +114,7 @@ export default function UserBooks({
 
           {transactions?.map((transaction) => (
             <Link
-              to={`/book/${transaction.book_slug}`}
+              to={`/book/${transaction.book_slug}/${transaction.book_id}`}
               key={transaction.transaction_id}
             >
               <div className={styles["book__details"]}>

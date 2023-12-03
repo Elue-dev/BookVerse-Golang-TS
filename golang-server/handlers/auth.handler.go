@@ -2,13 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"reflect"
 	"sync"
 
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
 	rabbitmq "github.com/elue-dev/BookVerse-Golang-TS/rabbitMQ"
+	"github.com/google/uuid"
 )
 
 var wg sync.WaitGroup
@@ -60,7 +63,10 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		defer wg.Done()
-		rabbitmq.ConsumeFromRabbitMQ()
+		callback := func(queueMsg models.QueueMessage) {
+			fmt.Printf("Received from queue: %+v\n", queueMsg)
+		}
+		rabbitmq.ConsumeFromRabbitMQ("welcome_user_queue", callback)
 	}()
 }
 
@@ -103,4 +109,74 @@ func CheckAuthStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.SendErrorResponse(w, http.StatusOK, "token is still valid", "token is valid")
+}
+
+func ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	type Payload struct {
+		Email string `json:"email"`
+	}
+
+	var payload Payload
+	queueName := "forgot_password_queue"
+	randomUUID := uuid.New().String()
+
+	json.NewDecoder(r.Body).Decode(&payload)
+
+	if payload.Email == "" {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide the email associated with your account", "email not provided in request body")
+		return
+	}
+
+	currUser, err := controllers.GetUser(randomUUID, payload.Email)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusNotFound, "could not find user", err.Error())
+		return
+	}
+
+	if reflect.DeepEqual(currUser, models.User{}) {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "User with the provided email has not been registered", "could not find user")
+		return
+	}
+
+	token, err := helpers.GenerateRandomToken(32)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
+		return
+	}
+
+	// hashedToken, err := helpers.HashPassword(token)
+	// if err != nil {
+	// 	helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
+	// 	return
+	// }
+
+	err = rabbitmq.SendToRabbitMQ(payload.Email, currUser.Username, token, queueName)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusUnauthorized, "could not send message to queue", err.Error())
+		return
+	}
+
+	responseChannel := make(chan models.QueueMessage)
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		callback := func(queueMsg models.QueueMessage) {
+			responseChannel <- queueMsg
+
+		}
+
+		rabbitmq.ConsumeFromRabbitMQ(queueName, callback)
+
+	}()
+
+	queueMsg := <-responseChannel
+
+	if !queueMsg.Success {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "something went wrong", fmt.Sprintf("could not send email to %v", payload.Email))
+	} else {
+		helpers.SendSuccessResponse(w, http.StatusOK, fmt.Sprintf("An email has been sent to %v with instructions to reset password", payload.Email))
+	}
 }

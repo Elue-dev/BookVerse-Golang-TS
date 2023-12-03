@@ -16,7 +16,7 @@ import (
 func GetSingleUser(w http.ResponseWriter, r *http.Request) {
 	userId := mux.Vars(r)["id"]
 
-	currUser, err := controllers.GetUser(userId)
+	currUser, err := controllers.GetUser(userId, "")
 
 	if err != nil {
 		helpers.SendErrorResponse(w, 404, "User not found", err.Error())

@@ -250,9 +250,9 @@ func GetUserBooks(userId string) ([]models.Book, error) {
 			&book.Image,
 			&book.UserId,
 			&book.Slug,
+			&book.Category,
 			&createdAt,
 			&updatedAt,
-			&book.UpdatedAt,
 		)
 		if err != nil {
 			return books, err

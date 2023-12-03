@@ -13,6 +13,7 @@ import {
 import { SyncLoader } from "react-spinners";
 import { Book } from "../../types/books";
 import { httpRequest } from "../../services/httpRequest";
+import PostContent from "../../components/FormatContent";
 
 type Option = {
   value: string;
@@ -88,7 +89,11 @@ export default function Books() {
                     <BsFillCalendar2PlusFill />{" "}
                     {moment(book.created_at).fromNow()}
                   </p>
-                  <p>{book.description.substring(0, 90)}...</p>
+                  <article>
+                    <PostContent
+                      content={book.description.substring(0, 90) + "..."}
+                    />
+                  </article>
                   <div className={styles.bottom}>
                     <Link to={`/book/${book.slug}/${book.id}`}>
                       <button>See Details</button>

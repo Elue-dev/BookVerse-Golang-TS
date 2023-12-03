@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -74,7 +76,7 @@ func GetUserFromToken(r *http.Request) (models.User, error) {
 			return models.User{}, errors.New("invalid token format")
 		}
 
-		currUser, err := controllers.GetUser(userId)
+		currUser, err := controllers.GetUser(userId, "")
 		if err != nil {
 			return models.User{}, err
 		}
@@ -83,4 +85,13 @@ func GetUserFromToken(r *http.Request) (models.User, error) {
 	} else {
 		return models.User{}, errors.New("invalid token provided")
 	}
+}
+
+func GenerateRandomToken(length int) (string, error) {
+	bytes := make([]byte, length)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(bytes), nil
 }

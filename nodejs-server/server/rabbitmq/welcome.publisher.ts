@@ -13,10 +13,11 @@ export async function consumeFromRabbitMQAndSendWelcomeEmail(
   channel.consume(
     queueName,
     (queueMessage: ConsumeMessage | Message | null) => {
-      let userEmail, username;
+      let userEmail, username, token;
       if (queueMessage) {
         userEmail = queueMessage?.content.toString().split(",")[0];
         username = queueMessage?.content.toString().split(",")[1];
+        token = queueMessage?.content.toString().split(",")[2];
       }
 
       const subject = `Welcome Onboard, ${username}!`;
@@ -32,12 +33,23 @@ export async function consumeFromRabbitMQAndSendWelcomeEmail(
           Buffer.from(
             JSON.stringify({
               success: true,
-              message: `Email has been succefully sent to ${username}`,
+              message: "Email has been succefully sent",
+              data: [],
             })
           )
         );
       } catch (error) {
         console.error("Error sending email", error);
+        channel.sendToQueue(
+          queueName,
+          Buffer.from(
+            JSON.stringify({
+              success: false,
+              message: "Error sending email",
+              data: [],
+            })
+          )
+        );
       }
 
       channel.ack(queueMessage!);

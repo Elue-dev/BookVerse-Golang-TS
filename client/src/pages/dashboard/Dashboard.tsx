@@ -106,6 +106,7 @@ export default function Dashboard() {
       }
     } catch (error: any) {
       setLoading(false);
+      toast.dismiss();
       console.log(error);
       errorToast(error.response.data.message);
     }
@@ -137,10 +138,12 @@ export default function Dashboard() {
             </span>
           </p>
           <div>
-            <img
-              src={imagePreview ? imagePreview : currentUser?.avatar}
-              alt={currentUser?.username}
-            />
+            <a href={currentUser?.avatar}>
+              <img
+                src={imagePreview ? imagePreview : currentUser?.avatar}
+                alt={currentUser?.username}
+              />
+            </a>
             <button onClick={() => imageRef?.current?.click()}>
               Change Picture
             </button>

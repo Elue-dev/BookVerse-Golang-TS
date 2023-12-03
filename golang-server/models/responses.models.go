@@ -31,3 +31,9 @@ type UserResponse struct {
 	UpdatedAt string `json:"updated_at"`
 	Password  string `json:"-"`
 }
+
+type QueueMessage struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}

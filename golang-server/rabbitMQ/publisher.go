@@ -7,9 +7,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func SendToRabbitMQ(userEmail string, username string) error {
+func SendToRabbitMQ(userEmail, username, token, queueName string) error {
 	RabbitMQURL := os.Getenv("RABBIT_URL")
-	QueueName := "welcome_user_queue"
 
 	conn, err := amqp.Dial(RabbitMQURL)
 	if err != nil {
@@ -24,7 +23,7 @@ func SendToRabbitMQ(userEmail string, username string) error {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		QueueName,
+		queueName,
 		false,
 		false,
 		false,
@@ -35,7 +34,7 @@ func SendToRabbitMQ(userEmail string, username string) error {
 		return err
 	}
 
-	message := fmt.Sprintf("%s,%s", userEmail, username)
+	message := fmt.Sprintf("%s,%s, %s", userEmail, username, token)
 	err = ch.Publish(
 		"",
 		q.Name,

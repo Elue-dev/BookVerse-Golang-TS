@@ -224,11 +224,13 @@ export default function BookDetail() {
         </a>
 
         <div className={styles["added__by"]}>
-          <img
-            src={book?.user_avatar}
-            alt={book?.username}
-            className={styles["user__img"]}
-          />
+          <a href={book?.user_avatar}>
+            <img
+              src={book?.user_avatar}
+              alt={book?.username}
+              className={styles["user__img"]}
+            />
+          </a>
           <div className={styles.user}>
             <b>{book?.username}</b>
             {currentUser?.id === book?.userId ? (
