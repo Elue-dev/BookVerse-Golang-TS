@@ -119,7 +119,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var payload Payload
-	queueName := "forgot_password_queue"
+	queueName := "FORGOT_PASSWORD_QUEUE"
 	randomUUID := uuid.New().String()
 
 	json.NewDecoder(r.Body).Decode(&payload)
@@ -196,7 +196,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var payload models.ResetPayload
 	token := mux.Vars(r)["token"]
 	userId := mux.Vars(r)["userId"]
-	queueName := "resett_password_queue"
+	queueName := "RESET_PASSWORD_QUEUE"
 
 	json.NewDecoder(r.Body).Decode(&payload)
 

@@ -44,7 +44,7 @@ func RegisterUser(u models.User) (models.UserResponse, error) {
 		return user, errors.New(err.Error())
 	}
 
-	err = rabbitmq.SendToRabbitMQ(user.Email, user.Username, user.ID, "", "welcone_user_queue")
+	err = rabbitmq.SendToRabbitMQ(user.Email, user.Username, user.ID, "", "WELCOME_USER_QUEUE")
 	if err != nil {
 		return user, errors.New("rabbit MQ error: could not send message to queue")
 	}

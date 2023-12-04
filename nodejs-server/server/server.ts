@@ -18,7 +18,7 @@ app.get("/healthz", function (req: Request, res: Response) {
 
 app.listen(PORT, function () {
   console.log(`Nodejs server listening on port ${PORT}`);
-  consumeFromRabbitMQAndSendWelcomeEmail("welcome_user_queue");
-  consumeFromRabbitMQAndSendFPasswordEmail("forgot_password_queue");
-  consumeFromRabbitMQAndSendRPasswordEmail("resett_password_queue");
+  consumeFromRabbitMQAndSendWelcomeEmail("WELCOME_USER_QUEUE");
+  consumeFromRabbitMQAndSendFPasswordEmail("FORGOT_PASSWORD_QUEUE");
+  consumeFromRabbitMQAndSendRPasswordEmail("RESET_PASSWORD_QUEUE");
 });
