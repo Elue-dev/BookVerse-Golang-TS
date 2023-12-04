@@ -13,14 +13,15 @@ export async function consumeFromRabbitMQAndSendFPasswordEmail(
   channel.consume(
     queueName,
     (queueMessage: ConsumeMessage | Message | null) => {
-      let userEmail, username, token;
+      let userEmail, username, userId, token;
       console.log(":content", queueMessage?.content.toString());
 
       if (queueMessage) {
         userEmail = queueMessage?.content.toString().split(",")[0];
         username = queueMessage?.content.toString().split(",")[1];
-        token = queueMessage?.content.toString().split(",")[2];
-        console.log({ token, userEmail, username });
+        userId = queueMessage?.content.toString().split(",")[2];
+        token = queueMessage?.content.toString().split(",")[3];
+        console.log({ token, userEmail, username, userId });
       }
       const subject = "Password reset request";
       const send_to = userEmail as string;
@@ -29,7 +30,7 @@ export async function consumeFromRabbitMQAndSendFPasswordEmail(
 
       const body = passwordResetEmail({
         username: username!,
-        url: `${process.env.CLIENT_URL}/reset-password/${token}`,
+        url: `${process.env.CLIENT_URL}/reset-password/${token}/${userId}`,
       });
 
       try {

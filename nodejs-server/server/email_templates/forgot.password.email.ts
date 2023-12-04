@@ -121,7 +121,7 @@ export const passwordResetEmail = ({ username, url }: passwordResetType) => {
                         <a
                           href="${url}"
                           style="
-                            background: #CE5158;
+                            background: #746ab0;
                             text-decoration: none !important;
                             font-weight: 500;
                             margin-top: 35px;

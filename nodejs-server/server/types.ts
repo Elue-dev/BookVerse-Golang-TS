@@ -10,3 +10,7 @@ export type passwordResetType = {
   username: string;
   url: string;
 };
+
+export interface resetSuccessType {
+  username: string | undefined;
+}

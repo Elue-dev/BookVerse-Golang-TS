@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type User struct {
 	ID        string `json:"id"`
 	Username  string `json:"username"`
@@ -67,4 +69,17 @@ type TransactionWithUserAndBookFields struct {
 	BookImg      string `json:"book_img"`
 	BookSlug     string `json:"book_slug"`
 	BookCategory string `json:"book_category"`
+}
+
+type Token struct {
+	ID        string    `json:"id"`
+	UserId    string    `json:"user_id"`
+	ExpiresAt time.Time `json:"expires_at"`
+	CreatedAt string    `json:"created_at"`
+	Token     string    `json:"token"`
+}
+
+type ResetPayload struct {
+	NewPassword     string `json:"new_password"`
+	ConfirmPassword string `json:"confirm_password"`
 }

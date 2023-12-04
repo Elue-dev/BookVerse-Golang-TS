@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { consumeFromRabbitMQAndSendWelcomeEmail } from "./rabbitmq/welcome.publisher";
 import { consumeFromRabbitMQAndSendFPasswordEmail } from "./rabbitmq/forgot.password.publisher";
+import { consumeFromRabbitMQAndSendRPasswordEmail } from "./rabbitmq/reset.password.publisher";
 
 dotenv.config();
 
@@ -19,4 +20,5 @@ app.listen(PORT, function () {
   console.log(`Nodejs server listening on port ${PORT}`);
   consumeFromRabbitMQAndSendWelcomeEmail("welcome_user_queue");
   consumeFromRabbitMQAndSendFPasswordEmail("forgot_password_queue");
+  consumeFromRabbitMQAndSendRPasswordEmail("resett_password_queue");
 });

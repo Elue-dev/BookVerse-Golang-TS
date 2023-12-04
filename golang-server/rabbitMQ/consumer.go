@@ -10,7 +10,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func ConsumeFromRabbitMQ(queueName string, callback func(models.QueueMessage)) {
+func ConsumeFromRabbitMQ(queueName string, queueMessageHandlerCallback func(models.QueueMessage)) {
 	rabbitMQURL := os.Getenv("RABBIT_URL")
 
 	conn, err := amqp.Dial(rabbitMQURL)
@@ -63,13 +63,7 @@ func ConsumeFromRabbitMQ(queueName string, callback func(models.QueueMessage)) {
 				fmt.Println("error unmarshalling json", err)
 			}
 
-			_, err = json.Marshal(queueMsg)
-			if err != nil {
-				fmt.Println("error marshalling json", err)
-			}
-
-			callback(queueMsg)
-
+			queueMessageHandlerCallback(queueMsg)
 		}
 	}()
 

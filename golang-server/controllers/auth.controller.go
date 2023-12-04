@@ -44,7 +44,7 @@ func RegisterUser(u models.User) (models.UserResponse, error) {
 		return user, errors.New(err.Error())
 	}
 
-	err = rabbitmq.SendToRabbitMQ(user.Email, user.Username, "", "welcone_user_queue")
+	err = rabbitmq.SendToRabbitMQ(user.Email, user.Username, user.ID, "", "welcone_user_queue")
 	if err != nil {
 		return user, errors.New("rabbit MQ error: could not send message to queue")
 	}
@@ -87,4 +87,24 @@ func LoginUser(p models.LoginPayload) (models.UserResponse, error) {
 	}
 
 	return user, nil
+}
+
+func ResetPassword(newPassword, userId string) error {
+	db := connections.CeateConnection()
+	defer db.Close()
+
+	sqlQuery := "UPDATE users SET password = $2 WHERE id = $1"
+
+	res, err := db.Exec(sqlQuery, userId, newPassword)
+
+	if err != nil {
+		return errors.New(err.Error())
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return errors.New(err.Error())
+	}
+
+	return nil
 }

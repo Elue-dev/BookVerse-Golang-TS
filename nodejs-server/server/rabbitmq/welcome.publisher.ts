@@ -13,11 +13,12 @@ export async function consumeFromRabbitMQAndSendWelcomeEmail(
   channel.consume(
     queueName,
     (queueMessage: ConsumeMessage | Message | null) => {
-      let userEmail, username, token;
+      let userEmail, username, userId, token;
       if (queueMessage) {
         userEmail = queueMessage?.content.toString().split(",")[0];
         username = queueMessage?.content.toString().split(",")[1];
-        token = queueMessage?.content.toString().split(",")[2];
+        userId = queueMessage?.content.toString().split(",")[2];
+        token = queueMessage?.content.toString().split(",")[3];
       }
 
       const subject = `Welcome Onboard, ${username}!`;

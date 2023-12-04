@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
 	rabbitmq "github.com/elue-dev/BookVerse-Golang-TS/rabbitMQ"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 var wg sync.WaitGroup
@@ -144,15 +146,17 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// hashedToken, err := helpers.HashPassword(token)
-	// if err != nil {
-	// 	helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
-	// 	return
-	// }
-
-	err = rabbitmq.SendToRabbitMQ(payload.Email, currUser.Username, token, queueName)
+	hashedToken, err := helpers.HashPassword(token)
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusUnauthorized, "could not send message to queue", err.Error())
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
+		return
+	}
+
+	expiresAt := time.Now().Add(10 * time.Minute)
+
+	err = controllers.AddToken(hashedToken, currUser.ID, expiresAt)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error creating token", err.Error())
 		return
 	}
 
@@ -163,20 +167,77 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		defer wg.Done()
 
-		callback := func(queueMsg models.QueueMessage) {
+		queueMessageHandlerCallback := func(queueMsg models.QueueMessage) {
 			responseChannel <- queueMsg
-
 		}
 
-		rabbitmq.ConsumeFromRabbitMQ(queueName, callback)
+		rabbitmq.ConsumeFromRabbitMQ(queueName, queueMessageHandlerCallback)
 
 	}()
 
+	err = rabbitmq.SendToRabbitMQ(payload.Email, currUser.Username, currUser.ID, token, queueName)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusUnauthorized, "could not send message to queue", err.Error())
+		return
+	}
+
 	queueMsg := <-responseChannel
+	fmt.Println("queueMsg", queueMsg)
 
 	if !queueMsg.Success {
 		helpers.SendErrorResponse(w, http.StatusInternalServerError, "something went wrong", fmt.Sprintf("could not send email to %v", payload.Email))
-	} else {
-		helpers.SendSuccessResponse(w, http.StatusOK, fmt.Sprintf("An email has been sent to %v with instructions to reset password", payload.Email))
+		return
 	}
+
+	helpers.SendSuccessResponse(w, http.StatusOK, fmt.Sprintf("An email has been sent to %v with instructions to reset password", payload.Email))
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var payload models.ResetPayload
+	token := mux.Vars(r)["token"]
+	userId := mux.Vars(r)["userId"]
+	queueName := "resett_password_queue"
+
+	json.NewDecoder(r.Body).Decode(&payload)
+
+	if payload.NewPassword == "" || payload.ConfirmPassword == "" {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "Both passsword credentials are required", "please provide both new_password and confirm_password")
+		return
+	}
+
+	if payload.NewPassword != payload.ConfirmPassword {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "New passsword credentials do not match", "new_password and confirm_password do not match")
+		return
+	}
+
+	result, err := controllers.GetToken(userId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Something went wrong", err.Error())
+		return
+	}
+
+	if tokenIsCorrect := helpers.ComparePasswordWithHash(result.Token, token); !tokenIsCorrect {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Invalid or expired token", "token provided is either not valid or has expired")
+		return
+	}
+
+	newPasswordHash, err := helpers.HashPassword(payload.NewPassword)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error hashing new password", err.Error())
+		return
+	}
+
+	err = controllers.ResetPassword(newPasswordHash, result.UserId)
+	if err != nil {
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "Error resetting password", err.Error())
+		return
+	}
+
+	currUser, _ := controllers.GetUser(result.UserId, "")
+
+	_ = controllers.RemoveToken(result.ID)
+
+	_ = rabbitmq.SendToRabbitMQ(currUser.Email, currUser.Username, result.ID, "", queueName)
+
+	helpers.SendSuccessResponse(w, http.StatusOK, "Password has been successfully reset")
 }
