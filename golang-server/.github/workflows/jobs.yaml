@@ -22,6 +22,6 @@ jobs:
       - name: Create .env file
         run: echo "$SECRET_ENV_CONTENT" > .env
 
-      - name: Build and Run Docker
+      - name: Build Docker Image
         run: |
           docker build -t bookverse .

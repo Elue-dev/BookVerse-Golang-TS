@@ -7,9 +7,7 @@ import {
   SendResponseArgs,
   SuccessResponseArgs,
 } from "../types";
-import { passwordResetEmail } from "../email_templates/forgot.password.email";
 import { welcomeEmail } from "../email_templates/welcome.mail";
-import { resetSuccess } from "../email_templates/reset.password.email";
 
 export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
   const channel = await establishRabbitConnection();
@@ -45,39 +43,25 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
         emailOptions.SUBJECT = `Welcome Onboard, ${username}!`;
         emailOptions.BODY = welcomeEmail(username);
         break;
-      case "FP_QUEUE":
-        emailOptions.SUBJECT = "Password reset request";
-        emailOptions.BODY = passwordResetEmail({
-          username: username,
-          url: `${process.env.CLIENT_URL}/auth/reset-password/${token}/${userId}`,
-        });
-        break;
-      case "RP_QUEUE":
-        emailOptions.SUBJECT = `${username}, Your password was successfully reset`;
-        emailOptions.BODY = resetSuccess({
-          username,
-        });
-        break;
       default:
         sendErrorResponse({
           channel,
           queueName,
           consumerTag: undefined,
           message:
-            "Queue name provided does not match any of the options (WELCOME_USER_QUEUE, FP_QUEUE, RP_QUEUE)",
+            "Queue name provided does not match the expected queue name (WELCOME_USER_QUEUE)",
         });
         return;
     }
 
     try {
       sendEmail(emailOptions);
-      if (queueName !== "RP_QUEUE") {
-        sendSuccessResponse({
-          channel,
-          queueName,
-          consumerTag: queueMessage?.fields.consumerTag,
-        });
-      }
+
+      sendSuccessResponse({
+        channel,
+        queueName,
+        consumerTag: queueMessage?.fields.consumerTag,
+      });
     } catch (error) {
       console.error("Error sending email", error);
       sendErrorResponse({

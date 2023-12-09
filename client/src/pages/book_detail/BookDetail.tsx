@@ -236,13 +236,10 @@ export default function BookDetail() {
             {currentUser?.id === book?.userId ? (
               <p>
                 Added by you on{" "}
-                {new Date(book?.created_at || Date.now()).toDateString()}
+                {new Date(book?.created_at ?? "").toDateString()}
               </p>
             ) : (
-              <p>
-                Added on{" "}
-                {new Date(book?.created_at || Date.now()).toDateString()}
-              </p>
+              <p>Added on {new Date(book?.created_at ?? "").toDateString()}</p>
             )}
           </div>
 

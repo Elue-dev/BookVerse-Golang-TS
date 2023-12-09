@@ -51,13 +51,8 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = hashedPassword
 
-	cloudURL, statusCode, err := helpers.UploadMediaToCloud(w, r, "avatar")
-	if err != nil {
-		helpers.SendErrorResponse(w, statusCode, "media upload error", err.Error())
-		return
-	}
-
-	user.Avatar = cloudURL
+	defaultAvatar := "https://res.cloudinary.com/dwdsjbetu/image/upload/v1694223269/djsplkr1hyxxtor7mogw.jpg"
+	user.Avatar = defaultAvatar
 
 	result, err := controllers.RegisterUser(user)
 

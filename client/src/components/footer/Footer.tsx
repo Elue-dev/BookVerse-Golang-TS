@@ -8,13 +8,15 @@ export default function Footer() {
 
   return (
     <footer className={styles.footer}>
-      <p>
-        <Link to="/">
-          <BiBookReader />
-          <b>BOOKVERSE</b>
-        </Link>
-      </p>
-      <p>&copy; {new Date().getFullYear()}. All Rights Reserved.</p>
+      <div className={styles.wrapper}>
+        <p>
+          <Link to="/">
+            <BiBookReader />
+            <b>BOOKVERSE</b>
+          </Link>
+        </p>
+        <p>&copy; {new Date().getFullYear()}. All Rights Reserved.</p>
+      </div>
     </footer>
   );
 }

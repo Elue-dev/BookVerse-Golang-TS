@@ -1,11 +1,8 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/cloudinary/cloudinary-go/v2"
-	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/elue-dev/BookVerse-Golang-TS/controllers"
 	"github.com/elue-dev/BookVerse-Golang-TS/helpers"
 	"github.com/elue-dev/BookVerse-Golang-TS/models"
@@ -91,26 +88,13 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		user.Avatar = currUser.Avatar
 	} else {
-		if file != nil {
-			cld, err := cloudinary.New()
-			if err != nil {
-				helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to initialize Cloudinary", err.Error())
-				return
-			}
-
-			var ctx = context.Background()
-			uploadResult, err := cld.Upload.Upload(
-				ctx,
-				file,
-				uploader.UploadParams{PublicID: "book image"})
-
-			if err != nil {
-				helpers.SendErrorResponse(w, http.StatusInternalServerError, "Failed to upload avatar", err.Error())
-				return
-			}
-
-			user.Avatar = uploadResult.SecureURL
+		cloudURL, statusCode, err := helpers.UploadMediaToCloud(w, r, "image")
+		if err != nil {
+			helpers.SendErrorResponse(w, statusCode, "media upload error", err.Error())
+			return
 		}
+
+		user.Avatar = cloudURL
 	}
 
 	defer func() {

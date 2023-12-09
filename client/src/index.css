@@ -23,10 +23,8 @@ body {
 
 footer {
   position: relative;
-  margin-top: -180px;
-  height: 180px;
+  height: 130px;
   clear: both;
-  background-color: red;
 }
 
 .loading {

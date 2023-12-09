@@ -348,7 +348,7 @@ export default function AddBook() {
         )}
 
         <div className={styles.genres}>
-          <h4>Select Book Genre</h4>
+          <h4>Select Book Genre/Category</h4>
           <div className={styles.genre}>
             {categories?.map((cat: string) => (
               <div key={cat}>
