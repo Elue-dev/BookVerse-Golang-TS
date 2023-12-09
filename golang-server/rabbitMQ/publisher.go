@@ -9,6 +9,8 @@ import (
 
 func SendMessageToQueue(userEmail, username, userId, token, queueName string) error {
 	RabbitMQURL := os.Getenv("RABBIT_URL")
+	msg := fmt.Sprintf("%s,%s,%s,%s", userEmail, username, userId, token)
+	fmt.Printf("Sending message to queue [x]: PUBLISHER: %s\n", msg)
 
 	conn, err := amqp.Dial(RabbitMQURL)
 	if err != nil {

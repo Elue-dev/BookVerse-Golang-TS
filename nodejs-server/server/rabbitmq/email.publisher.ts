@@ -16,6 +16,8 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
   await channel.assertQueue(queueName, { durable: false });
 
   channel.consume(queueName, async (queueMessage: QueueMessage) => {
+    console.log({ redelivered: queueMessage?.fields.redelivered });
+
     if (!queueMessage) {
       sendErrorResponse({
         channel,
@@ -23,13 +25,12 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
         consumerTag: undefined,
         message: "No message found in queue",
       });
-
       return;
     }
 
     const [userEmail, username, userId, token] = queueMessage?.content
       .toString()
-      .split(",");
+      .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
 
     const emailOptions: EmailOptions = {
       SUBJECT: "",
@@ -44,14 +45,14 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
         emailOptions.SUBJECT = `Welcome Onboard, ${username}!`;
         emailOptions.BODY = welcomeEmail(username);
         break;
-      case "FORGOT_PASSWORD_QUEUE":
+      case "FP_QUEUE":
         emailOptions.SUBJECT = "Password reset request";
         emailOptions.BODY = passwordResetEmail({
           username: username,
           url: `${process.env.CLIENT_URL}/auth/reset-password/${token}/${userId}`,
         });
         break;
-      case "RESET_PASSWORD_QUEUE":
+      case "RP_QUEUE":
         emailOptions.SUBJECT = `${username}, Your password was successfully reset`;
         emailOptions.BODY = resetSuccess({
           username,
@@ -63,18 +64,20 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
           queueName,
           consumerTag: undefined,
           message:
-            "Queue name provided does not match any of the options (WELCOME_USER_QUEUE, FORGOT_PASSWORD_QUEUE, RESET_PASSWORD_QUEUE)",
+            "Queue name provided does not match any of the options (WELCOME_USER_QUEUE, FP_QUEUE, RP_QUEUE)",
         });
         return;
     }
 
     try {
       sendEmail(emailOptions);
-      sendSuccessResponse({
-        channel,
-        queueName,
-        consumerTag: queueMessage?.fields.consumerTag,
-      });
+      if (queueName !== "RP_QUEUE") {
+        sendSuccessResponse({
+          channel,
+          queueName,
+          consumerTag: queueMessage?.fields.consumerTag,
+        });
+      }
     } catch (error) {
       console.error("Error sending email", error);
       sendErrorResponse({

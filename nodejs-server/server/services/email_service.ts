@@ -3,8 +3,8 @@ import nodemailer from "nodemailer";
 import { EmailOptions } from "../types";
 
 const limiter = new Bottleneck({
-  maxConcurrent: 1, // Set the maximum number of concurrent requests
-  minTime: 1000, // Set the minimum time between requests (in milliseconds)
+  maxConcurrent: 1,
+  minTime: 1000,
 });
 
 const sendEmail = limiter.wrap(
