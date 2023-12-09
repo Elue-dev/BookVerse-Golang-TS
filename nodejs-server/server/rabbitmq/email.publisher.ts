@@ -2,9 +2,10 @@ import sendEmail from "../services/email_service";
 import { establishRabbitConnection } from "./establish.connection";
 import {
   EmailOptions,
+  ErrorResponseArgs,
   QueueMessage,
-  ResponseArgs,
   SendResponseArgs,
+  SuccessResponseArgs,
 } from "../types";
 import { passwordResetEmail } from "../email_templates/forgot.password.email";
 import { welcomeEmail } from "../email_templates/welcome.mail";
@@ -20,6 +21,7 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
         channel,
         queueName,
         consumerTag: undefined,
+        message: "No message found in queue",
       });
 
       return;
@@ -60,6 +62,8 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
           channel,
           queueName,
           consumerTag: undefined,
+          message:
+            "Queue name provided does not match any of the options (WELCOME_USER_QUEUE, FORGOT_PASSWORD_QUEUE, RESET_PASSWORD_QUEUE)",
         });
         return;
     }
@@ -77,6 +81,7 @@ export async function consumeFromRabbitMQAndSendEmail(queueName: string) {
         channel,
         queueName,
         consumerTag: queueMessage?.fields.consumerTag,
+        message: `Error sending email, ${error}`,
       });
     }
 
@@ -88,7 +93,7 @@ function sendSuccessResponse({
   channel,
   queueName,
   consumerTag,
-}: ResponseArgs) {
+}: SuccessResponseArgs) {
   sendResponse({
     channel,
     queueName,
@@ -98,12 +103,17 @@ function sendSuccessResponse({
   stopConsuming(channel, consumerTag!);
 }
 
-function sendErrorResponse({ channel, queueName, consumerTag }: ResponseArgs) {
+function sendErrorResponse({
+  channel,
+  queueName,
+  consumerTag,
+  message,
+}: ErrorResponseArgs) {
   sendResponse({
     channel,
     queueName,
     success: false,
-    message: "Error sending email",
+    message,
   });
   stopConsuming(channel, consumerTag!);
 }

@@ -17,10 +17,17 @@ export type resetSuccessType = {
   username: string | undefined;
 };
 
-export type ResponseArgs = {
+export type SuccessResponseArgs = {
   channel: any;
   queueName: string;
   consumerTag: string | undefined;
+};
+
+export type ErrorResponseArgs = {
+  channel: any;
+  queueName: string;
+  consumerTag: string | undefined;
+  message: string;
 };
 
 export type SendResponseArgs = {
