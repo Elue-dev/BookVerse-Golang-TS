@@ -8,6 +8,7 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/google/uuid"
 )
 
 func UploadMediaToCloud(w http.ResponseWriter, r *http.Request, field string) (string, int, error) {
@@ -24,11 +25,12 @@ func UploadMediaToCloud(w http.ResponseWriter, r *http.Request, field string) (s
 	}
 
 	var ctx = context.Background()
+	randomUUID := uuid.New().String()
 
 	uploadResult, err := cld.Upload.Upload(
 		ctx,
 		file,
-		uploader.UploadParams{PublicID: field})
+		uploader.UploadParams{PublicID: field + randomUUID})
 
 	if err != nil {
 		return "", http.StatusInternalServerError, fmt.Errorf("failed to upload %v", field)

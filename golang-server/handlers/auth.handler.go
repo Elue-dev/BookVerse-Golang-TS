@@ -31,6 +31,13 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	user.Email = r.FormValue("email")
 	user.Password = r.FormValue("password")
 
+	existingUser, _ := controllers.GetUser(uuid.New().String(), user.Email)
+
+	if helpers.IsNotEmpty(existingUser) {
+		helpers.SendErrorResponse(w, http.StatusBadRequest, "A user with this Email already exists.", fmt.Sprintf("a user with the Email: %v already exists.", existingUser.Email))
+		return
+	}
+
 	if isValidated := helpers.ValidateSignUpFields(user.Username, user.Email, user.Password); !isValidated {
 		helpers.SendErrorResponse(w, http.StatusBadRequest, "Please provide username, email and password", nil)
 		return
@@ -68,7 +75,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		callback := func(queueMsg models.QueueMessage) {
 			fmt.Printf("Received from queue: %+v\n", queueMsg)
 		}
-		rabbitmq.ConsumeFromRabbitMQ("welcome_user_queue", callback)
+		rabbitmq.ConsumeMessageFromQueue("WELCOME_USER_QUEUE", callback)
 	}()
 }
 
@@ -131,7 +138,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	currUser, err := controllers.GetUser(randomUUID, payload.Email)
 	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusNotFound, "could not find user", err.Error())
+		helpers.SendErrorResponse(w, http.StatusNotFound, "Could not find user. Has this user been registered?", err.Error())
 		return
 	}
 
@@ -171,25 +178,28 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 			responseChannel <- queueMsg
 		}
 
-		rabbitmq.ConsumeFromRabbitMQ(queueName, queueMessageHandlerCallback)
+		rabbitmq.ConsumeMessageFromQueue(queueName, queueMessageHandlerCallback)
 
 	}()
 
-	err = rabbitmq.SendToRabbitMQ(payload.Email, currUser.Username, currUser.ID, token, queueName)
-	if err != nil {
-		helpers.SendErrorResponse(w, http.StatusUnauthorized, "could not send message to queue", err.Error())
+	go func() {
+		err := rabbitmq.SendMessageToQueue(payload.Email, currUser.Username, currUser.ID, token, queueName)
+		if err != nil {
+			fmt.Println("Error sending message to RabbitMQ:", err)
+		}
+		fmt.Println("Message sent to RabbitMQ successfully")
+	}()
+
+	select {
+	case queueMsg := <-responseChannel:
+		if !queueMsg.Success {
+			helpers.SendErrorResponse(w, http.StatusInternalServerError, "something went wrong", fmt.Sprintf("could not send email to %v", payload.Email))
+			return
+		}
+	case <-time.After(5 * time.Second):
+		helpers.SendErrorResponse(w, http.StatusInternalServerError, "A network timeout occured. If you did not recieve the email, please try again.", "timed out while waiting for the response. please try again")
 		return
 	}
-
-	queueMsg := <-responseChannel
-	fmt.Println("queueMsg", queueMsg)
-
-	if !queueMsg.Success {
-		helpers.SendErrorResponse(w, http.StatusInternalServerError, "something went wrong", fmt.Sprintf("could not send email to %v", payload.Email))
-		return
-	}
-
-	helpers.SendSuccessResponse(w, http.StatusOK, fmt.Sprintf("An email has been sent to %v with instructions to reset password", payload.Email))
 }
 
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
@@ -237,7 +247,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	_ = controllers.RemoveToken(result.ID)
 
-	_ = rabbitmq.SendToRabbitMQ(currUser.Email, currUser.Username, result.ID, "", queueName)
+	_ = rabbitmq.SendMessageToQueue(currUser.Email, currUser.Username, result.ID, "", queueName)
 
 	helpers.SendSuccessResponse(w, http.StatusOK, "Password has been successfully reset")
 }

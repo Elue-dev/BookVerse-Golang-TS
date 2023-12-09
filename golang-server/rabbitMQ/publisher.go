@@ -7,7 +7,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func SendToRabbitMQ(userEmail, username, userId, token, queueName string) error {
+func SendMessageToQueue(userEmail, username, userId, token, queueName string) error {
 	RabbitMQURL := os.Getenv("RABBIT_URL")
 
 	conn, err := amqp.Dial(RabbitMQURL)

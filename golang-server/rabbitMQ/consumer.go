@@ -10,7 +10,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func ConsumeFromRabbitMQ(queueName string, queueMessageHandlerCallback func(models.QueueMessage)) {
+func ConsumeMessageFromQueue(queueName string, queueMessageHandlerCallback func(models.QueueMessage)) {
 	rabbitMQURL := os.Getenv("RABBIT_URL")
 
 	conn, err := amqp.Dial(rabbitMQURL)

@@ -14,8 +14,10 @@ import NotFound from "./pages/not_found/NotFound";
 import { httpRequest } from "./services/httpRequest";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserToken, REMOVE_ACTIVE_USER } from "./redux/slices/auth.slice";
+import ResetPassword from "./pages/auth/ResetPassword";
 const Home = lazy(() => import("./pages/home/Home"));
 const Auth = lazy(() => import("./pages/auth/Auth"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const Books = lazy(() => import("./pages/books/Books"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const AddBook = lazy(() => import("./pages/add_book/AddBook"));
@@ -31,12 +33,14 @@ function App() {
 
   useEffect(() => {
     async function checkAuthStatus() {
-      try {
-        await httpRequest.post("/auth/checkAuthStatus", null, authHeaders);
-      } catch (error: any) {
-        if (error.response.data.error_details === "token malformed") {
-          dispatch(REMOVE_ACTIVE_USER());
-          navigate("/auth");
+      if (token !== null) {
+        try {
+          await httpRequest.post("/auth/checkAuthStatus", null, authHeaders);
+        } catch (error: any) {
+          if (error.response.data.error_details === "token malformed") {
+            dispatch(REMOVE_ACTIVE_USER());
+            navigate("/auth");
+          }
         }
       }
     }
@@ -71,6 +75,22 @@ function App() {
                 element={
                   <Unauthenticated>
                     <Auth />
+                  </Unauthenticated>
+                }
+              />
+              <Route
+                path="/auth/forgot-password"
+                element={
+                  <Unauthenticated>
+                    <ForgotPassword />
+                  </Unauthenticated>
+                }
+              />
+              <Route
+                path="/auth/reset-password/:t/:u"
+                element={
+                  <Unauthenticated>
+                    <ResetPassword />
                   </Unauthenticated>
                 }
               />

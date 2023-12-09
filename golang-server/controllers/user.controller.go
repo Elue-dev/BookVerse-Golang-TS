@@ -18,6 +18,7 @@ func GetUser(userId, userEmail string) (models.User, error) {
 	sqlQuery := "SELECT * FROM users WHERE id = $1 OR email = $2"
 
 	rows := db.QueryRow(sqlQuery, userId, userEmail)
+	fmt.Println("rows", rows)
 
 	err := rows.Scan(
 		&user.ID,

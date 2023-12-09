@@ -67,7 +67,7 @@ export default function Auth() {
       return errorToast("Please provide your Email or Username and Password");
 
     if (!/^[A-Za-z0-9\s]+$/.test(values.emailOrUsername)) {
-      return errorToast("Your username contains unwanted characters");
+      return errorToast("Your username or email contains unwanted characters");
     }
 
     setLoading(true);
@@ -109,6 +109,10 @@ export default function Auth() {
 
     if (values.username && !/^[A-Za-z0-9\s]+$/.test(values.username)) {
       return errorToast("Your username contains unwanted characters");
+    }
+
+    if (values.password.length < 6) {
+      return errorToast("Password should be at least 6 characters");
     }
 
     setLoading(true);
@@ -244,6 +248,12 @@ export default function Auth() {
                 </span>
               </div>
             </label>
+
+            <Link to="/auth/forgot-password">
+              <p style={{ textAlign: "right", margin: ".8rem 0" }}>
+                Forgot Password?
+              </p>
+            </Link>
 
             {authState === "login" && <br />}
 

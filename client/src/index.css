@@ -60,6 +60,11 @@ footer {
   color: #746ab0;
 }
 
+a {
+  text-decoration: none;
+  color: #333;
+}
+
 @media (max-width: 600px) {
   .loading {
     width: 90%;

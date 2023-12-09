@@ -1,5 +1,11 @@
 package helpers
 
+import (
+	"reflect"
+
+	"github.com/elue-dev/BookVerse-Golang-TS/models"
+)
+
 func ValidateSignUpFields(username, email, password string) bool {
 	if username == "" || email == "" || password == "" {
 		return false
@@ -46,4 +52,17 @@ func ValidateTransactionFields(bookId, transactionId string) bool {
 	} else {
 		return true
 	}
+}
+
+func IsNotEmpty(user models.User) bool {
+	v := reflect.ValueOf(user)
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		zeroValue := reflect.Zero(field.Type()).Interface()
+		if reflect.DeepEqual(field.Interface(), zeroValue) {
+			continue
+		}
+		return true
+	}
+	return false
 }
