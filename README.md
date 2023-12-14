@@ -1,6 +1,6 @@
 # BookVerse
 
-- A books application
+- A books application. Servers follow an event driven architecture using microservices.
 
 ### Frontend
 
@@ -23,3 +23,6 @@
 ### Message Queue
 
 - **Rabbit MQ**: This was used for communication between the two servers, using the AMQP Protocol. An example is, when a user is signed, the Go server sends the user information in the queue which is being picked up by the Node.js server which then sends the email and also sends a message to the queue when it is done sending the email so the Go seever then picks it up to know if it was successful or not.
+
+### Deployment
+The servers were containerized with Docker and deployed on [Railway](https://railway.app). Frontend was deployed on vercel.
