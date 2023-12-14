@@ -27,4 +27,4 @@
 
 
 ### Deployment
-The servers were containerized with Docker and deployed on [Railway](https://railway.app). Frontend was deployed on vercel.
+The servers were containerized with Docker and deployed on [Railway](https://railway.app)
