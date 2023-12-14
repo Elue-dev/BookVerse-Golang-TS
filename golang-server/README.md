@@ -27,4 +27,4 @@
 
 
 ### Deployment
-The server were containerized with Docker and deployed on [Railway](https://railway.app)
+The server was containerized with Docker and deployed on [Railway](https://railway.app)
